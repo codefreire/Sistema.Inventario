@@ -1,0 +1,1 @@
+namespace Sistema.Inventario.Producto.Aplicacion.Handlers;

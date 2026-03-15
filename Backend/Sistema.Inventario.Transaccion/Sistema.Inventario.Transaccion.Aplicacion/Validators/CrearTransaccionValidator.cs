@@ -1,0 +1,1 @@
+namespace Sistema.Inventario.Transaccion.Aplicacion.Validators;
