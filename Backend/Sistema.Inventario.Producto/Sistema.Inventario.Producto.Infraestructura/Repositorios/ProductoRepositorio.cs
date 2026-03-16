@@ -31,4 +31,14 @@ public class ProductoRepositorio : IProductoRepositorio
     {
         return await _contexto.Productos.AsNoTracking().ToListAsync();
     }
+
+    /// <summary>
+    /// Método para obtener un Producto por su Id
+    /// </summary>
+    /// <param name="id">Identificador único del Producto</param>
+    /// <returns>Producto encontrado o null si no existe</returns>
+    public async Task<ProductoEntidad?> ObtenerProductoPorIdAsync(Guid id)
+    {
+        return await _contexto.Productos.AsNoTracking().FirstOrDefaultAsync(producto => producto.Id == id);
+    }
 }

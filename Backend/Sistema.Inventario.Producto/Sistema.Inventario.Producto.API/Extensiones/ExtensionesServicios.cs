@@ -25,6 +25,7 @@ public static class ExtensionesServicios
         servicios.AddScoped<IProductoRepositorio, ProductoRepositorio>();
         servicios.AddScoped<IProductoServicio, ProductoServicio>();
         servicios.AddScoped<ObtenerProductosHandler>();
+        servicios.AddScoped<ObtenerProductoHandler>();
         return servicios;
     }
 }

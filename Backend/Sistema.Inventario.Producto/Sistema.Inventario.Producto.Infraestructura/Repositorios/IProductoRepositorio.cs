@@ -12,4 +12,11 @@ public interface IProductoRepositorio
     /// </summary>
     /// <returns>Lista de productos</returns>
     Task<List<ProductoEntidad>> ObtenerProductosAsync();
+
+    /// <summary>
+    /// Método para obtener un Producto por su Id
+    /// </summary>
+    /// <param name="id">Identificador del Producto</param>
+    /// <returns>Producto encontrado o null si no existe</returns>
+    Task<ProductoEntidad?> ObtenerProductoPorIdAsync(Guid id);
 }

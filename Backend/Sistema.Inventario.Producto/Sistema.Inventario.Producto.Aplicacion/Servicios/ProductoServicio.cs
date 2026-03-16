@@ -41,4 +41,28 @@ public class ProductoServicio : IProductoServicio
             Stock = producto.Stock
         }).ToList();
     }
+
+    /// <summary>
+    /// Método para obtener un Producto por su Id
+    /// </summary>
+    /// <param name="id">Identificador del Producto</param>
+    /// <returns>Producto encontrado o null si no existe</returns>
+    public async Task<ProductoResponse?> ObtenerProductoPorIdAsync(Guid id)
+    {
+        ProductoEntidad? producto = await _productoRepositorio.ObtenerProductoPorIdAsync(id);
+        if (producto is null)
+        {
+            return null;
+        }
+        return new ProductoResponse
+        {
+            Id = producto.Id,
+            Nombre = producto.Nombre,
+            Descripcion = producto.Descripcion,
+            Categoria = producto.Categoria,
+            ImagenUrl = producto.ImagenUrl,
+            Precio = producto.Precio,
+            Stock = producto.Stock
+        };
+    }
 }

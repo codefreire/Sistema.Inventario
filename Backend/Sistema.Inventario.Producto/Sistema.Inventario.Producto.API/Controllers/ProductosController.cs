@@ -17,12 +17,19 @@ public class ProductosController : ControllerBase
     private readonly ObtenerProductosHandler _obtenerProductosHandler;
 
     /// <summary>
+    /// Handler para obtener un Producto por su Id
+    /// </summary>
+    private readonly ObtenerProductoHandler _obtenerProductoHandler;
+
+    /// <summary>
     /// Constructor del controlador de Productos
     /// </summary>
     /// <param name="obtenerProductosHandler">Handler para obtener la lista de Productos</param>
-    public ProductosController(ObtenerProductosHandler obtenerProductosHandler)
+    /// <param name="obtenerProductoHandler">Handler para obtener un Producto por su Id</param>
+    public ProductosController(ObtenerProductosHandler obtenerProductosHandler, ObtenerProductoHandler obtenerProductoHandler)
     {
         _obtenerProductosHandler = obtenerProductosHandler;
+        _obtenerProductoHandler = obtenerProductoHandler;
     }
 
     /// <summary>
@@ -34,5 +41,21 @@ public class ProductosController : ControllerBase
     {
         List<ProductoResponse> productos = await _obtenerProductosHandler.Handle();
         return Ok(productos);
+    }
+
+    /// <summary>
+    /// Endpoint para obtener un Producto por su Id
+    /// </summary>
+    /// <param name="id">Identificador del Producto</param>
+    /// <returns>Producto encontrado</returns>
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<ProductoResponse>> ObtenerProducto(Guid id)
+    {
+        ProductoResponse? producto = await _obtenerProductoHandler.Handle(id);
+        if (producto is null)
+        {
+            return NotFound($"No se encontró el producto con Id {id}.");
+        }
+        return Ok(producto);
     }
 }
