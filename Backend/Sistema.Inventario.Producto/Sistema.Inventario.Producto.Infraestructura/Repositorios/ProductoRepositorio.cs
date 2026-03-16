@@ -41,4 +41,14 @@ public class ProductoRepositorio : IProductoRepositorio
     {
         return await _contexto.Productos.AsNoTracking().FirstOrDefaultAsync(producto => producto.Id == id);
     }
+
+    /// <summary>
+    /// Método para crear un Producto
+    /// </summary>
+    /// <param name="producto">Entidad del Producto a crear</param>
+    public async Task CrearProductoAsync(ProductoEntidad producto)
+    {
+        await _contexto.Productos.AddAsync(producto);
+        await _contexto.SaveChangesAsync();
+    }
 }

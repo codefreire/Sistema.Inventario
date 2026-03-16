@@ -19,4 +19,10 @@ public interface IProductoRepositorio
     /// <param name="id">Identificador del Producto</param>
     /// <returns>Producto encontrado o null si no existe</returns>
     Task<ProductoEntidad?> ObtenerProductoPorIdAsync(Guid id);
+
+    /// <summary>
+    /// Método para crear un Producto
+    /// </summary>
+    /// <param name="entidad">Entidad del Producto a crear</param>
+    Task CrearProductoAsync(ProductoEntidad entidad);
 }

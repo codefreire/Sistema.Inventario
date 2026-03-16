@@ -1,3 +1,4 @@
+using Sistema.Inventario.Producto.Aplicacion.DTOs.Requests;
 using Sistema.Inventario.Producto.Aplicacion.DTOs.Responses;
 
 namespace Sistema.Inventario.Producto.Aplicacion.Servicios;
@@ -19,4 +20,11 @@ public interface IProductoServicio
     /// <param name="id">Identificador del Producto</param>
     /// <returns>Producto encontrado o null si no existe</returns>
     Task<ProductoResponse?> ObtenerProductoPorIdAsync(Guid id);
+
+    /// <summary>
+    /// Método para crear un Producto
+    /// </summary>
+    /// <param name="request">Datos del Producto a crear</param>
+    /// <returns>Producto creado</returns>
+    Task<ProductoResponse> CrearProductoAsync(CrearProductoRequest request);
 }

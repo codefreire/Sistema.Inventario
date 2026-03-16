@@ -1,3 +1,4 @@
+using Sistema.Inventario.Producto.Aplicacion.DTOs.Requests;
 using Sistema.Inventario.Producto.Aplicacion.DTOs.Responses;
 using Sistema.Inventario.Producto.Dominio.Entidades;
 using Sistema.Inventario.Producto.Infraestructura.Repositorios;
@@ -54,6 +55,38 @@ public class ProductoServicio : IProductoServicio
         {
             return null;
         }
+        return new ProductoResponse
+        {
+            Id = producto.Id,
+            Nombre = producto.Nombre,
+            Descripcion = producto.Descripcion,
+            Categoria = producto.Categoria,
+            ImagenUrl = producto.ImagenUrl,
+            Precio = producto.Precio,
+            Stock = producto.Stock
+        };
+    }
+
+    /// <summary>
+    /// Método para crear un Producto
+    /// </summary>
+    /// <param name="request">Datos del Producto a crear</param>
+    /// <returns>Producto creado</returns>
+    public async Task<ProductoResponse> CrearProductoAsync(CrearProductoRequest request)
+    {
+        ProductoEntidad producto = new()
+        {
+            Id = Guid.NewGuid(),
+            Nombre = request.Nombre,
+            Descripcion = request.Descripcion,
+            Categoria = request.Categoria,
+            ImagenUrl = request.ImagenUrl,
+            Precio = request.Precio,
+            Stock = request.Stock
+        };
+
+        await _productoRepositorio.CrearProductoAsync(producto);
+
         return new ProductoResponse
         {
             Id = producto.Id,

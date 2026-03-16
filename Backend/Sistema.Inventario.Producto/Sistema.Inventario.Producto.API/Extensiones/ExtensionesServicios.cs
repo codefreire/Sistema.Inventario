@@ -1,6 +1,9 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Sistema.Inventario.Producto.Aplicacion.Handlers;
 using Sistema.Inventario.Producto.Aplicacion.Servicios;
+using Sistema.Inventario.Producto.Aplicacion.Validators;
 using Sistema.Inventario.Producto.Infraestructura.Persistencia;
 using Sistema.Inventario.Producto.Infraestructura.Repositorios;
 
@@ -26,6 +29,11 @@ public static class ExtensionesServicios
         servicios.AddScoped<IProductoServicio, ProductoServicio>();
         servicios.AddScoped<ObtenerProductosHandler>();
         servicios.AddScoped<ObtenerProductoHandler>();
+        servicios.AddScoped<CrearProductoHandler>();
+
+        servicios.AddFluentValidationAutoValidation();
+        servicios.AddValidatorsFromAssemblyContaining<ObtenerProductoPorIdValidator>();
+        servicios.AddValidatorsFromAssemblyContaining<CrearProductoValidator>();
         return servicios;
     }
 }
