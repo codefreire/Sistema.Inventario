@@ -23,6 +23,14 @@ public interface IProductoRepositorio
     /// <summary>
     /// Método para crear un Producto
     /// </summary>
-    /// <param name="entidad">Entidad del Producto a crear</param>
-    Task CrearProductoAsync(ProductoEntidad entidad);
+    /// <param name="productoEntidad">Entidad del Producto a crear</param>
+    Task CrearProductoAsync(ProductoEntidad productoEntidad);
+
+    /// <summary>
+    /// Método para actualizar un Producto
+    /// </summary>
+    /// <param name="id">Identificador del Producto</param>
+    /// <param name="productoEntidad">Datos del Producto a actualizar</param>
+    /// <returns>Producto actualizado o null si no existe</returns>
+    Task<ProductoEntidad?> ActualizarProductoAsync(Guid id, ProductoEntidad productoEntidad);
 }

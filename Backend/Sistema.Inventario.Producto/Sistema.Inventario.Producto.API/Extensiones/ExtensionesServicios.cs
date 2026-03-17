@@ -30,10 +30,12 @@ public static class ExtensionesServicios
         servicios.AddScoped<ObtenerProductosHandler>();
         servicios.AddScoped<ObtenerProductoHandler>();
         servicios.AddScoped<CrearProductoHandler>();
+        servicios.AddScoped<ActualizarProductoHandler>();
 
         servicios.AddFluentValidationAutoValidation();
         servicios.AddValidatorsFromAssemblyContaining<ObtenerProductoPorIdValidator>();
         servicios.AddValidatorsFromAssemblyContaining<CrearProductoValidator>();
+        servicios.AddValidatorsFromAssemblyContaining<ActualizarProductoValidator>();
         return servicios;
     }
 }

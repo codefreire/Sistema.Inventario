@@ -28,16 +28,23 @@ public class ProductosController : ControllerBase
     private readonly CrearProductoHandler _crearProductoHandler;
 
     /// <summary>
+    /// Handler para actualizar un Producto
+    /// </summary>
+    private readonly ActualizarProductoHandler _actualizarProductoHandler;
+
+    /// <summary>
     /// Constructor del controlador de Productos
     /// </summary>
     /// <param name="obtenerProductosHandler">Handler para obtener la lista de Productos</param>
     /// <param name="obtenerProductoHandler">Handler para obtener un Producto por su Id</param>
     /// <param name="crearProductoHandler">Handler para crear un Producto</param>
-    public ProductosController(ObtenerProductosHandler obtenerProductosHandler, ObtenerProductoHandler obtenerProductoHandler, CrearProductoHandler crearProductoHandler)
+    /// <param name="actualizarProductoHandler">Handler para actualizar un Producto</param>
+    public ProductosController(ObtenerProductosHandler obtenerProductosHandler, ObtenerProductoHandler obtenerProductoHandler, CrearProductoHandler crearProductoHandler, ActualizarProductoHandler actualizarProductoHandler)
     {
         _obtenerProductosHandler = obtenerProductosHandler;
         _obtenerProductoHandler = obtenerProductoHandler;
         _crearProductoHandler = crearProductoHandler;
+        _actualizarProductoHandler = actualizarProductoHandler;
     }
 
     /// <summary>
@@ -77,5 +84,22 @@ public class ProductosController : ControllerBase
     {
         ProductoResponse producto = await _crearProductoHandler.Handle(request);
         return CreatedAtAction(nameof(ObtenerProducto), new { id = producto.Id }, producto);
+    }
+
+    /// <summary>
+    /// Endpoint para actualizar un Producto
+    /// </summary>
+    /// <param name="idRequest">Dato para obtener el Id del Producto</param>
+    /// <param name="request">Datos del Producto a actualizar</param>
+    /// <returns>Producto actualizado</returns>
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<ProductoResponse>> ActualizarProducto([FromRoute] ObtenerProductoPorIdRequest idRequest, [FromBody] ActualizarProductoRequest request)
+    {
+        ProductoResponse? producto = await _actualizarProductoHandler.Handle(idRequest.Id, request);
+        if (producto is null)
+        {
+            return NotFound($"No se encontró el producto con Id {idRequest.Id}.");
+        }
+        return Ok(producto);
     }
 }

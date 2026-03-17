@@ -27,4 +27,12 @@ public interface IProductoServicio
     /// <param name="request">Datos del Producto a crear</param>
     /// <returns>Producto creado</returns>
     Task<ProductoResponse> CrearProductoAsync(CrearProductoRequest request);
+
+    /// <summary>
+    /// Método para actualizar un Producto
+    /// </summary>
+    /// <param name="id">Identificador del Producto</param>
+    /// <param name="request">Datos del Producto a actualizar</param>
+    /// <returns>Producto actualizado o null si no existe</returns>
+    Task<ProductoResponse?> ActualizarProductoAsync(Guid id, ActualizarProductoRequest request);
 }

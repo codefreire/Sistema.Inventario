@@ -98,4 +98,40 @@ public class ProductoServicio : IProductoServicio
             Stock = producto.Stock
         };
     }
+
+    /// <summary>
+    /// Método para actualizar un Producto
+    /// </summary>
+    /// <param name="id">Identificador del Producto</param>
+    /// <param name="request">Datos del Producto a actualizar</param>
+    /// <returns>Producto actualizado o null si no existe</returns>
+    public async Task<ProductoResponse?> ActualizarProductoAsync(Guid id, ActualizarProductoRequest request)
+    {
+        ProductoEntidad datosActualizados = new()
+        {
+            Nombre = request.Nombre,
+            Descripcion = request.Descripcion,
+            Categoria = request.Categoria,
+            ImagenUrl = request.ImagenUrl,
+            Precio = request.Precio,
+            Stock = request.Stock
+        };
+
+        ProductoEntidad? producto = await _productoRepositorio.ActualizarProductoAsync(id, datosActualizados);
+        if (producto is null)
+        {
+            return null;
+        }
+
+        return new ProductoResponse
+        {
+            Id = producto.Id,
+            Nombre = producto.Nombre,
+            Descripcion = producto.Descripcion,
+            Categoria = producto.Categoria,
+            ImagenUrl = producto.ImagenUrl,
+            Precio = producto.Precio,
+            Stock = producto.Stock
+        };
+    }
 }

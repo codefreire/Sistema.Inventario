@@ -45,10 +45,35 @@ public class ProductoRepositorio : IProductoRepositorio
     /// <summary>
     /// Método para crear un Producto
     /// </summary>
-    /// <param name="producto">Entidad del Producto a crear</param>
-    public async Task CrearProductoAsync(ProductoEntidad producto)
+    /// <param name="productoEntidad">Entidad del Producto a crear</param>
+    public async Task CrearProductoAsync(ProductoEntidad productoEntidad)
     {
-        await _contexto.Productos.AddAsync(producto);
+        await _contexto.Productos.AddAsync(productoEntidad);
         await _contexto.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Método para actualizar un Producto
+    /// </summary>
+    /// <param name="id">Identificador del Producto</param>
+    /// <param name="productoEntidad">Datos del Producto a actualizar</param>
+    /// <returns>Producto actualizado o null si no existe</returns>
+    public async Task<ProductoEntidad?> ActualizarProductoAsync(Guid id, ProductoEntidad productoEntidad)
+    {
+        ProductoEntidad? producto = await _contexto.Productos.FirstOrDefaultAsync(producto => producto.Id == id);
+        if (producto is null)
+        {
+            return null;
+        }
+
+        producto.Nombre = productoEntidad.Nombre;
+        producto.Descripcion = productoEntidad.Descripcion;
+        producto.Categoria = productoEntidad.Categoria;
+        producto.ImagenUrl = productoEntidad.ImagenUrl;
+        producto.Precio = productoEntidad.Precio;
+        producto.Stock = productoEntidad.Stock;
+
+        await _contexto.SaveChangesAsync();
+        return producto;
     }
 }
