@@ -33,4 +33,11 @@ public interface IProductoRepositorio
     /// <param name="productoEntidad">Datos del Producto a actualizar</param>
     /// <returns>Producto actualizado o null si no existe</returns>
     Task<ProductoEntidad?> ActualizarProductoAsync(Guid id, ProductoEntidad productoEntidad);
+
+    /// <summary>
+    /// Método para eliminar un Producto
+    /// </summary>
+    /// <param name="id">Identificador del Producto</param>
+    /// <returns>True si fue eliminado, false si no existe</returns>
+    Task<bool> EliminarProductoAsync(Guid id);
 }

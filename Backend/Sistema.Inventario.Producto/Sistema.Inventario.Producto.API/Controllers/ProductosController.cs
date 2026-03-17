@@ -33,18 +33,25 @@ public class ProductosController : ControllerBase
     private readonly ActualizarProductoHandler _actualizarProductoHandler;
 
     /// <summary>
+    /// Handler para eliminar un Producto
+    /// </summary>
+    private readonly EliminarProductoHandler _eliminarProductoHandler;
+
+    /// <summary>
     /// Constructor del controlador de Productos
     /// </summary>
     /// <param name="obtenerProductosHandler">Handler para obtener la lista de Productos</param>
     /// <param name="obtenerProductoHandler">Handler para obtener un Producto por su Id</param>
     /// <param name="crearProductoHandler">Handler para crear un Producto</param>
     /// <param name="actualizarProductoHandler">Handler para actualizar un Producto</param>
-    public ProductosController(ObtenerProductosHandler obtenerProductosHandler, ObtenerProductoHandler obtenerProductoHandler, CrearProductoHandler crearProductoHandler, ActualizarProductoHandler actualizarProductoHandler)
+    /// <param name="eliminarProductoHandler">Handler para eliminar un Producto</param>
+    public ProductosController(ObtenerProductosHandler obtenerProductosHandler, ObtenerProductoHandler obtenerProductoHandler, CrearProductoHandler crearProductoHandler, ActualizarProductoHandler actualizarProductoHandler, EliminarProductoHandler eliminarProductoHandler)
     {
         _obtenerProductosHandler = obtenerProductosHandler;
         _obtenerProductoHandler = obtenerProductoHandler;
         _crearProductoHandler = crearProductoHandler;
         _actualizarProductoHandler = actualizarProductoHandler;
+        _eliminarProductoHandler = eliminarProductoHandler;
     }
 
     /// <summary>
@@ -101,5 +108,21 @@ public class ProductosController : ControllerBase
             return NotFound($"No se encontró el producto con Id {idRequest.Id}.");
         }
         return Ok(producto);
+    }
+
+    /// <summary>
+    /// Endpoint para eliminar un Producto
+    /// </summary>
+    /// <param name="request">Dato para obtener el Id del Producto</param>
+    /// <returns>Sin contenido si fue eliminado</returns>
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> EliminarProducto([FromRoute] ObtenerProductoPorIdRequest request)
+    {
+        bool eliminado = await _eliminarProductoHandler.Handle(request.Id);
+        if (!eliminado)
+        {
+            return NotFound($"No se encontró el producto con Id {request.Id}.");
+        }
+        return NoContent();
     }
 }

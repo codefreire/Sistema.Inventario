@@ -76,4 +76,22 @@ public class ProductoRepositorio : IProductoRepositorio
         await _contexto.SaveChangesAsync();
         return producto;
     }
+
+    /// <summary>
+    /// Método para eliminar un Producto
+    /// </summary>
+    /// <param name="id">Identificador del Producto</param>
+    /// <returns>True si fue eliminado, false si no existe</returns>
+    public async Task<bool> EliminarProductoAsync(Guid id)
+    {
+        ProductoEntidad? producto = await _contexto.Productos.FirstOrDefaultAsync(producto => producto.Id == id);
+        if (producto is null)
+        {
+            return false;
+        }
+
+        _contexto.Productos.Remove(producto);
+        await _contexto.SaveChangesAsync();
+        return true;
+    }
 }

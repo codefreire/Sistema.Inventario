@@ -134,4 +134,14 @@ public class ProductoServicio : IProductoServicio
             Stock = producto.Stock
         };
     }
+
+    /// <summary>
+    /// Método para eliminar un Producto
+    /// </summary>
+    /// <param name="id">Identificador del Producto</param>
+    /// <returns>True si fue eliminado, false si no existe</returns>
+    public async Task<bool> EliminarProductoAsync(Guid id)
+    {
+        return await _productoRepositorio.EliminarProductoAsync(id);
+    }
 }

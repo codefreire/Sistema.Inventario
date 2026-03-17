@@ -35,4 +35,11 @@ public interface IProductoServicio
     /// <param name="request">Datos del Producto a actualizar</param>
     /// <returns>Producto actualizado o null si no existe</returns>
     Task<ProductoResponse?> ActualizarProductoAsync(Guid id, ActualizarProductoRequest request);
+
+    /// <summary>
+    /// Método para eliminar un Producto
+    /// </summary>
+    /// <param name="id">Identificador del Producto</param>
+    /// <returns>True si fue eliminado, false si no existe</returns>
+    Task<bool> EliminarProductoAsync(Guid id);
 }
