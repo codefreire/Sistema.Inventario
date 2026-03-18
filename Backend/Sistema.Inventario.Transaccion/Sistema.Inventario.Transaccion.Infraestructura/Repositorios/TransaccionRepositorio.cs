@@ -41,4 +41,14 @@ public class TransaccionRepositorio : ITransaccionRepositorio
     {
         return await _contexto.Transacciones.AsNoTracking().FirstOrDefaultAsync(transaccion => transaccion.Id == id);
     }
+
+    /// <summary>
+    /// Método para crear una Transacción
+    /// </summary>
+    /// <param name="transaccionEntidad">Entidad de la Transacción a crear</param>
+    public async Task CrearTransaccionAsync(TransaccionEntidad transaccionEntidad)
+    {
+        await _contexto.Transacciones.AddAsync(transaccionEntidad);
+        await _contexto.SaveChangesAsync();
+    }
 }

@@ -22,14 +22,21 @@ public class TransaccionesController : ControllerBase
     private readonly ObtenerTransaccionHandler _obtenerTransaccionHandler;
 
     /// <summary>
+    /// Handler para crear una Transacción
+    /// </summary>
+    private readonly CrearTransaccionHandler _crearTransaccionHandler;
+
+    /// <summary>
     /// Constructor del controlador de Transacciones
     /// </summary>
     /// <param name="obtenerTransaccionesHandler">Handler para obtener la lista de Transacciones</param>
     /// <param name="obtenerTransaccionHandler">Handler para obtener una Transacción por su Id</param>
-    public TransaccionesController(ObtenerTransaccionesHandler obtenerTransaccionesHandler, ObtenerTransaccionHandler obtenerTransaccionHandler)
+    /// <param name="crearTransaccionHandler">Handler para crear una Transacción</param>
+    public TransaccionesController(ObtenerTransaccionesHandler obtenerTransaccionesHandler, ObtenerTransaccionHandler obtenerTransaccionHandler, CrearTransaccionHandler crearTransaccionHandler)
     {
         _obtenerTransaccionesHandler = obtenerTransaccionesHandler;
         _obtenerTransaccionHandler = obtenerTransaccionHandler;
+        _crearTransaccionHandler = crearTransaccionHandler;
     }
 
     /// <summary>
@@ -57,5 +64,17 @@ public class TransaccionesController : ControllerBase
             return NotFound($"No se encontró la transacción con Id {request.Id}.");
         }
         return Ok(transaccion);
+    }
+
+    /// <summary>
+    /// Endpoint para crear una Transacción
+    /// </summary>
+    /// <param name="request">Datos de la Transacción a crear</param>
+    /// <returns>Transacción creada</returns>
+    [HttpPost]
+    public async Task<ActionResult<TransaccionResponse>> CrearTransaccion([FromBody] CrearTransaccionRequest request)
+    {
+        TransaccionResponse transaccion = await _crearTransaccionHandler.Handle(request);
+        return CreatedAtAction(nameof(ObtenerTransferencia), new { id = transaccion.Id }, transaccion);
     }
 }

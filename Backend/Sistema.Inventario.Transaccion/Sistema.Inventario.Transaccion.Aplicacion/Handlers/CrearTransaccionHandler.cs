@@ -1,3 +1,5 @@
+using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Requests;
+using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Responses;
 using Sistema.Inventario.Transaccion.Aplicacion.Servicios;
 
 namespace Sistema.Inventario.Transaccion.Aplicacion.Handlers;
@@ -19,5 +21,15 @@ public class CrearTransaccionHandler
     public CrearTransaccionHandler(ITransaccionServicio transaccionServicio)
     {
         _transaccionServicio = transaccionServicio;
+    }
+
+    /// <summary>
+    /// Método para manejar la creación de una Transacción
+    /// </summary>
+    /// <param name="request">Datos de la Transacción a crear</param>
+    /// <returns>Transacción creada</returns>
+    public async Task<TransaccionResponse> Handle(CrearTransaccionRequest request)
+    {
+        return await _transaccionServicio.CrearTransaccionAsync(request);
     }
 }

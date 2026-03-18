@@ -1,3 +1,4 @@
+using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Requests;
 using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Responses;
 using Sistema.Inventario.Transaccion.Dominio.Entidades;
 using Sistema.Inventario.Transaccion.Infraestructura.Repositorios;
@@ -55,6 +56,40 @@ public class TransaccionServicio : ITransaccionServicio
         {
             return null;
         }
+        return new TransaccionResponse
+        {
+            Id = transaccion.Id,
+            Fecha = transaccion.Fecha,
+            TipoTransaccion = transaccion.TipoTransaccion,
+            ProductoId = transaccion.ProductoId,
+            Cantidad = transaccion.Cantidad,
+            PrecioUnitario = transaccion.PrecioUnitario,
+            PrecioTotal = transaccion.PrecioTotal,
+            Detalle = transaccion.Detalle
+        };
+    }
+
+    /// <summary>
+    /// Método para crear una Transacción
+    /// </summary>
+    /// <param name="request">Datos de la Transacción a crear</param>
+    /// <returns>Transacción creada</returns>
+    public async Task<TransaccionResponse> CrearTransaccionAsync(CrearTransaccionRequest request)
+    {
+        TransaccionEntidad transaccion = new()
+        {
+            Id = Guid.NewGuid(),
+            Fecha = DateTime.Now,
+            TipoTransaccion = request.TipoTransaccion,
+            ProductoId = request.ProductoId,
+            Cantidad = request.Cantidad,
+            PrecioUnitario = request.PrecioUnitario,
+            PrecioTotal = request.Cantidad * request.PrecioUnitario,
+            Detalle = request.Detalle
+        };
+
+        await _transaccionRepositorio.CrearTransaccionAsync(transaccion);
+
         return new TransaccionResponse
         {
             Id = transaccion.Id,

@@ -1,5 +1,6 @@
 namespace Sistema.Inventario.Transaccion.Aplicacion.Servicios;
 
+using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Requests;
 using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Responses;
 
 /// <summary>
@@ -19,4 +20,11 @@ public interface ITransaccionServicio
     /// <param name="id">Identificador de la Transacción</param>
     /// <returns>Transacción encontrada o null si no existe</returns>
     Task<TransaccionResponse?> ObtenerTransaccionPorIdAsync(Guid id);
+
+    /// <summary>
+    /// Método para crear una Transacción
+    /// </summary>
+    /// <param name="request">Datos de la Transacción a crear</param>
+    /// <returns>Transacción creada</returns>
+    Task<TransaccionResponse> CrearTransaccionAsync(CrearTransaccionRequest request);
 }
