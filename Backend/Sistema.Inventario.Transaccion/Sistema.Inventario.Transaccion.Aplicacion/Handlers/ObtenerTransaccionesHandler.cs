@@ -1,13 +1,11 @@
-using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Requests;
-using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Responses;
 using Sistema.Inventario.Transaccion.Aplicacion.Servicios;
 
 namespace Sistema.Inventario.Transaccion.Aplicacion.Handlers;
 
 /// <summary>
-/// Handler para actualizar una Transacción
+/// Handler para obtener la lista de Transacciones
 /// </summary>
-public class ActualizarTransaccionHandler
+public class ObtenerTransaccionesHandler
 {
     /// <summary>
     /// Servicio para manejar la lógica de negocio de Transacciones
@@ -15,10 +13,10 @@ public class ActualizarTransaccionHandler
     private readonly ITransaccionServicio _transaccionServicio;
 
     /// <summary>
-    /// Constructor del handler para actualizar una Transacción
+    /// Constructor del handler para obtener la lista de Transacciones
     /// </summary>
     /// <param name="transaccionServicio">Servicio para manejar la lógica de negocio de Transacciones</param>
-    public ActualizarTransaccionHandler(ITransaccionServicio transaccionServicio)
+    public ObtenerTransaccionesHandler(ITransaccionServicio transaccionServicio)
     {
         _transaccionServicio = transaccionServicio;
     }

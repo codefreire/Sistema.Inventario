@@ -45,12 +45,14 @@ public class ProductoEntidad
     /// <summary>
     /// El precio del Producto
     /// </summary>
+    [Required]
     [Range(typeof(decimal), "0", "99999999.99", ErrorMessage = "El precio debe ser mayor o igual a 0.")]
     public decimal Precio { get; set; }
 
     /// <summary>
     /// Cantidad de Productos en stock
     /// </summary>
+    [Required]
     [Range(0, int.MaxValue, ErrorMessage = "El stock debe ser mayor o igual a 0.")]
     public int Stock { get; set; }
 }

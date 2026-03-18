@@ -12,7 +12,7 @@ public class ProductoConfiguracion : IEntityTypeConfiguration<ProductoEntidad>
     /// <summary>
     /// Método para configurar la entidad Producto
     /// </summary>
-    /// <param name="builder">Constructor de modelos para configurar la entidad Producto</param>
+    /// <param name="builder">Constructor para configurar la entidad Producto</param>
     public void Configure(EntityTypeBuilder<ProductoEntidad> builder)
     {
         builder.ToTable("Productos", table =>
