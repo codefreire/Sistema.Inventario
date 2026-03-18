@@ -1,3 +1,4 @@
+using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Responses;
 using Sistema.Inventario.Transaccion.Aplicacion.Servicios;
 
 namespace Sistema.Inventario.Transaccion.Aplicacion.Handlers;
@@ -19,5 +20,15 @@ public class ObtenerTransaccionHandler
     public ObtenerTransaccionHandler(ITransaccionServicio transaccionServicio)
     {
         _transaccionServicio = transaccionServicio;
+    }
+
+    /// <summary>
+    /// Método para manejar la obtención de una Transacción por su Id
+    /// </summary>
+    /// <param name="id">Identificador de la Transacción</param>
+    /// <returns>Transacción encontrada o null si no existe</returns>
+    public async Task<TransaccionResponse?> Handle(Guid id)
+    {
+        return await _transaccionServicio.ObtenerTransaccionPorIdAsync(id);
     }
 }

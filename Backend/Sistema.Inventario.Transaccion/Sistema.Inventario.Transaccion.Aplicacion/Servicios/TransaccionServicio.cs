@@ -42,4 +42,29 @@ public class TransaccionServicio : ITransaccionServicio
             Detalle = transaccion.Detalle
         }).ToList();
     }
+
+    /// <summary>
+    /// Método para obtener una Transacción por su Id
+    /// </summary>
+    /// <param name="id">Identificador de la Transacción</param>
+    /// <returns>Transacción encontrada o null si no existe</returns>
+    public async Task<TransaccionResponse?> ObtenerTransaccionPorIdAsync(Guid id)
+    {
+        TransaccionEntidad? transaccion = await _transaccionRepositorio.ObtenerTransaccionPorIdAsync(id);
+        if (transaccion is null)
+        {
+            return null;
+        }
+        return new TransaccionResponse
+        {
+            Id = transaccion.Id,
+            Fecha = transaccion.Fecha,
+            TipoTransaccion = transaccion.TipoTransaccion,
+            ProductoId = transaccion.ProductoId,
+            Cantidad = transaccion.Cantidad,
+            PrecioUnitario = transaccion.PrecioUnitario,
+            PrecioTotal = transaccion.PrecioTotal,
+            Detalle = transaccion.Detalle
+        };
+    }
 }

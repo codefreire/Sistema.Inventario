@@ -31,4 +31,14 @@ public class TransaccionRepositorio : ITransaccionRepositorio
     {
         return await _contexto.Transacciones.AsNoTracking().ToListAsync();
     }
+
+    /// <summary>
+    /// Método para obtener una Transacción por su Id
+    /// </summary>
+    /// <param name="id">Identificador de la Transacción</param>
+    /// <returns>Transacción encontrada o null si no existe</returns>
+    public async Task<TransaccionEntidad?> ObtenerTransaccionPorIdAsync(Guid id)
+    {
+        return await _contexto.Transacciones.AsNoTracking().FirstOrDefaultAsync(transaccion => transaccion.Id == id);
+    }
 }

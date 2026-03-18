@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Requests;
 using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Responses;
 using Sistema.Inventario.Transaccion.Aplicacion.Handlers;
 namespace Sistema.Inventario.Transaccion.API.Controllers;
@@ -16,12 +17,19 @@ public class TransaccionesController : ControllerBase
     private readonly ObtenerTransaccionesHandler _obtenerTransaccionesHandler;
 
     /// <summary>
+    /// Handler para obtener una Transacción por su Id
+    /// </summary>
+    private readonly ObtenerTransaccionHandler _obtenerTransaccionHandler;
+
+    /// <summary>
     /// Constructor del controlador de Transacciones
     /// </summary>
     /// <param name="obtenerTransaccionesHandler">Handler para obtener la lista de Transacciones</param>
-    public TransaccionesController(ObtenerTransaccionesHandler obtenerTransaccionesHandler)
+    /// <param name="obtenerTransaccionHandler">Handler para obtener una Transacción por su Id</param>
+    public TransaccionesController(ObtenerTransaccionesHandler obtenerTransaccionesHandler, ObtenerTransaccionHandler obtenerTransaccionHandler)
     {
         _obtenerTransaccionesHandler = obtenerTransaccionesHandler;
+        _obtenerTransaccionHandler = obtenerTransaccionHandler;
     }
 
     /// <summary>
@@ -33,5 +41,21 @@ public class TransaccionesController : ControllerBase
     {
         List<TransaccionResponse> transacciones = await _obtenerTransaccionesHandler.Handle();
         return Ok(transacciones);
+    }
+
+    /// <summary>
+    /// Endpoint para obtener una Transacción por su Id
+    /// </summary>
+    /// <param name="request">Dato para obtener una Transacción por su Id</param>
+    /// <returns>Transacción encontrada</returns>
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<TransaccionResponse>> ObtenerTransferencia([FromRoute] ObtenerTransaccionPorIdRequest request)
+    {
+        TransaccionResponse? transaccion = await _obtenerTransaccionHandler.Handle(request.Id);
+        if (transaccion is null)
+        {
+            return NotFound($"No se encontró la transacción con Id {request.Id}.");
+        }
+        return Ok(transaccion);
     }
 }

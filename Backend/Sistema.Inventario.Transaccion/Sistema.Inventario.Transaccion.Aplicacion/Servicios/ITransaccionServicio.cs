@@ -12,4 +12,11 @@ public interface ITransaccionServicio
     /// </summary>
     /// <returns>Lista de transacciones</returns>
     Task<List<TransaccionResponse>> ObtenerTransaccionesAsync();
+
+    /// <summary>
+    /// Método para obtener una Transacción por su Id
+    /// </summary>
+    /// <param name="id">Identificador de la Transacción</param>
+    /// <returns>Transacción encontrada o null si no existe</returns>
+    Task<TransaccionResponse?> ObtenerTransaccionPorIdAsync(Guid id);
 }
