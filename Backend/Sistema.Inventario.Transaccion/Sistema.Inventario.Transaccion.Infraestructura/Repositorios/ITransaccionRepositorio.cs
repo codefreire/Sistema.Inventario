@@ -33,4 +33,11 @@ public interface ITransaccionRepositorio
     /// <param name="transaccionEntidad">Datos de la Transacción a actualizar</param>
     /// <returns>Transacción actualizada o null si no existe</returns>
     Task<TransaccionEntidad?> ActualizarTransaccionAsync(Guid id, TransaccionEntidad transaccionEntidad);
+
+    /// <summary>
+    /// Método para eliminar una Transacción
+    /// </summary>
+    /// <param name="id">Identificador de la Transacción</param>
+    /// <returns>True si fue eliminada, false si no existe</returns>
+    Task<bool> EliminarTransaccionAsync(Guid id);
 }

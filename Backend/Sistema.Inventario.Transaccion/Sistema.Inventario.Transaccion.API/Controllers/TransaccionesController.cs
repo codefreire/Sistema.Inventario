@@ -32,18 +32,25 @@ public class TransaccionesController : ControllerBase
     private readonly ActualizarTransaccionHandler _actualizarTransaccionHandler;
 
     /// <summary>
+    /// Handler para eliminar una Transacción
+    /// </summary>
+    private readonly EliminarTransaccionHandler _eliminarTransaccionHandler;
+
+    /// <summary>
     /// Constructor del controlador de Transacciones
     /// </summary>
     /// <param name="obtenerTransaccionesHandler">Handler para obtener la lista de Transacciones</param>
     /// <param name="obtenerTransaccionHandler">Handler para obtener una Transacción por su Id</param>
     /// <param name="crearTransaccionHandler">Handler para crear una Transacción</param>
     /// <param name="actualizarTransaccionHandler">Handler para actualizar una Transacción</param>
-    public TransaccionesController(ObtenerTransaccionesHandler obtenerTransaccionesHandler, ObtenerTransaccionHandler obtenerTransaccionHandler, CrearTransaccionHandler crearTransaccionHandler, ActualizarTransaccionHandler actualizarTransaccionHandler)
+    /// <param name="eliminarTransaccionHandler">Handler para eliminar una Transacción</param>
+    public TransaccionesController(ObtenerTransaccionesHandler obtenerTransaccionesHandler, ObtenerTransaccionHandler obtenerTransaccionHandler, CrearTransaccionHandler crearTransaccionHandler, ActualizarTransaccionHandler actualizarTransaccionHandler, EliminarTransaccionHandler eliminarTransaccionHandler)
     {
         _obtenerTransaccionesHandler = obtenerTransaccionesHandler;
         _obtenerTransaccionHandler = obtenerTransaccionHandler;
         _crearTransaccionHandler = crearTransaccionHandler;
         _actualizarTransaccionHandler = actualizarTransaccionHandler;
+        _eliminarTransaccionHandler = eliminarTransaccionHandler;
     }
 
     /// <summary>
@@ -100,5 +107,21 @@ public class TransaccionesController : ControllerBase
             return NotFound($"No se encontró la transacción con Id {idRequest.Id}.");
         }
         return Ok(transaccion);
+    }
+
+    /// <summary>
+    /// Endpoint para eliminar una Transacción
+    /// </summary>
+    /// <param name="request">Dato para obtener el Id de la Transacción</param>
+    /// <returns>Sin contenido si fue eliminada</returns>
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> EliminarTransaccion([FromRoute] ObtenerTransaccionPorIdRequest request)
+    {
+        bool eliminada = await _eliminarTransaccionHandler.Handle(request.Id);
+        if (!eliminada)
+        {
+            return NotFound($"No se encontró la transacción con Id {request.Id}.");
+        }
+        return NoContent();
     }
 }

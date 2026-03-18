@@ -35,4 +35,11 @@ public interface ITransaccionServicio
     /// <param name="request">Datos de la Transacción a actualizar</param>
     /// <returns>Transacción actualizada o null si no existe</returns>
     Task<TransaccionResponse?> ActualizarTransaccionAsync(Guid id, ActualizarTransaccionRequest request);
+
+    /// <summary>
+    /// Método para eliminar una Transacción
+    /// </summary>
+    /// <param name="id">Identificador de la Transacción</param>
+    /// <returns>True si fue eliminada, false si no existe</returns>
+    Task<bool> EliminarTransaccionAsync(Guid id);
 }

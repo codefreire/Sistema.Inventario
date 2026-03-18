@@ -76,4 +76,22 @@ public class TransaccionRepositorio : ITransaccionRepositorio
         await _contexto.SaveChangesAsync();
         return transaccion;
     }
+
+    /// <summary>
+    /// Método para eliminar una Transacción
+    /// </summary>
+    /// <param name="id">Identificador de la Transacción</param>
+    /// <returns>True si fue eliminada, false si no existe</returns>
+    public async Task<bool> EliminarTransaccionAsync(Guid id)
+    {
+        TransaccionEntidad? transaccion = await _contexto.Transacciones.FirstOrDefaultAsync(transaccion => transaccion.Id == id);
+        if (transaccion is null)
+        {
+            return false;
+        }
+
+        _contexto.Transacciones.Remove(transaccion);
+        await _contexto.SaveChangesAsync();
+        return true;
+    }
 }

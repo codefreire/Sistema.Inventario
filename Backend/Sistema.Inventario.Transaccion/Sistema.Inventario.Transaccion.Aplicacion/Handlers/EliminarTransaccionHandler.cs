@@ -20,4 +20,14 @@ public class EliminarTransaccionHandler
     {
         _transaccionServicio = transaccionServicio;
     }
+
+    /// <summary>
+    /// Método para manejar la eliminación de una Transacción
+    /// </summary>
+    /// <param name="id">Identificador de la Transacción</param>
+    /// <returns>True si fue eliminada, false si no existe</returns>
+    public async Task<bool> Handle(Guid id)
+    {
+        return await _transaccionServicio.EliminarTransaccionAsync(id);
+    }
 }

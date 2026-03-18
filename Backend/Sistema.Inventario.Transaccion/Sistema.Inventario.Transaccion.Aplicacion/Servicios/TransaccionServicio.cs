@@ -139,4 +139,14 @@ public class TransaccionServicio : ITransaccionServicio
             Detalle = transaccion.Detalle
         };
     }
+
+    /// <summary>
+    /// Método para eliminar una Transacción
+    /// </summary>
+    /// <param name="id">Identificador de la Transacción</param>
+    /// <returns>True si fue eliminada, false si no existe</returns>
+    public async Task<bool> EliminarTransaccionAsync(Guid id)
+    {
+        return await _transaccionRepositorio.EliminarTransaccionAsync(id);
+    }
 }
