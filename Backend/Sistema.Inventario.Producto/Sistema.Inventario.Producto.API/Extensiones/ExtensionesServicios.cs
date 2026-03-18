@@ -25,6 +25,20 @@ public static class ExtensionesServicios
         servicios.AddDbContext<ProductoDbContext>(opciones =>
             opciones.UseSqlServer(configuracion.GetConnectionString("cnInventarioProductosBD")));
 
+        string[] origenesPermitidos = configuracion.GetSection("Cors:origenesPermitidos").Get<string[]>() ?? Array.Empty<string>();
+        servicios.AddCors(opciones =>
+        {
+            opciones.AddPolicy("PoliticaFrontend", politica =>
+            {
+                if (origenesPermitidos.Length > 0)
+                {
+                    politica.WithOrigins(origenesPermitidos)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                }
+            });
+        });
+
         servicios.AddScoped<IProductoRepositorio, ProductoRepositorio>();
         servicios.AddScoped<IProductoServicio, ProductoServicio>();
         servicios.AddScoped<ObtenerProductosHandler>();
