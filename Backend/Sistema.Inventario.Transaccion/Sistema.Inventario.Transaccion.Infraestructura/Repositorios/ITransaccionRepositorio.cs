@@ -25,4 +25,12 @@ public interface ITransaccionRepositorio
     /// </summary>
     /// <param name="transaccionEntidad">Entidad de la Transacción a crear</param>
     Task CrearTransaccionAsync(TransaccionEntidad transaccionEntidad);
+
+    /// <summary>
+    /// Método para actualizar una Transacción
+    /// </summary>
+    /// <param name="id">Identificador de la Transacción</param>
+    /// <param name="transaccionEntidad">Datos de la Transacción a actualizar</param>
+    /// <returns>Transacción actualizada o null si no existe</returns>
+    Task<TransaccionEntidad?> ActualizarTransaccionAsync(Guid id, TransaccionEntidad transaccionEntidad);
 }

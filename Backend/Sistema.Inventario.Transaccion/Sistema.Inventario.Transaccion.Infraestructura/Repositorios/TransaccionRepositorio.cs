@@ -51,4 +51,29 @@ public class TransaccionRepositorio : ITransaccionRepositorio
         await _contexto.Transacciones.AddAsync(transaccionEntidad);
         await _contexto.SaveChangesAsync();
     }
+
+    /// <summary>
+    /// Método para actualizar una Transacción
+    /// </summary>
+    /// <param name="id">Identificador de la Transacción</param>
+    /// <param name="transaccionEntidad">Datos de la Transacción a actualizar</param>
+    /// <returns>Transacción actualizada o null si no existe</returns>
+    public async Task<TransaccionEntidad?> ActualizarTransaccionAsync(Guid id, TransaccionEntidad transaccionEntidad)
+    {
+        TransaccionEntidad? transaccion = await _contexto.Transacciones.FirstOrDefaultAsync(transaccion => transaccion.Id == id);
+        if (transaccion is null)
+        {
+            return null;
+        }
+
+        transaccion.TipoTransaccion = transaccionEntidad.TipoTransaccion;
+        transaccion.ProductoId = transaccionEntidad.ProductoId;
+        transaccion.Cantidad = transaccionEntidad.Cantidad;
+        transaccion.PrecioUnitario = transaccionEntidad.PrecioUnitario;
+        transaccion.PrecioTotal = transaccionEntidad.PrecioTotal;
+        transaccion.Detalle = transaccionEntidad.Detalle;
+
+        await _contexto.SaveChangesAsync();
+        return transaccion;
+    }
 }

@@ -27,4 +27,12 @@ public interface ITransaccionServicio
     /// <param name="request">Datos de la Transacción a crear</param>
     /// <returns>Transacción creada</returns>
     Task<TransaccionResponse> CrearTransaccionAsync(CrearTransaccionRequest request);
+
+    /// <summary>
+    /// Método para actualizar una Transacción
+    /// </summary>
+    /// <param name="id">Identificador de la Transacción</param>
+    /// <param name="request">Datos de la Transacción a actualizar</param>
+    /// <returns>Transacción actualizada o null si no existe</returns>
+    Task<TransaccionResponse?> ActualizarTransaccionAsync(Guid id, ActualizarTransaccionRequest request);
 }

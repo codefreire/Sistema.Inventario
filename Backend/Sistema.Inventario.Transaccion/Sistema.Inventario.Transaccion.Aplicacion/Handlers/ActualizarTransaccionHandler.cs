@@ -22,4 +22,15 @@ public class ActualizarTransaccionHandler
     {
         _transaccionServicio = transaccionServicio;
     }
+
+    /// <summary>
+    /// Método para manejar la actualización de una Transacción
+    /// </summary>
+    /// <param name="id">Identificador de la Transacción</param>
+    /// <param name="request">Datos de la Transacción a actualizar</param>
+    /// <returns>Transacción actualizada o null si no existe</returns>
+    public async Task<TransaccionResponse?> Handle(Guid id, ActualizarTransaccionRequest request)
+    {
+        return await _transaccionServicio.ActualizarTransaccionAsync(id, request);
+    }
 }

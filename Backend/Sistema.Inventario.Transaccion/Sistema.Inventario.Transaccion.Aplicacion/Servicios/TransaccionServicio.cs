@@ -102,4 +102,41 @@ public class TransaccionServicio : ITransaccionServicio
             Detalle = transaccion.Detalle
         };
     }
+
+    /// <summary>
+    /// Método para actualizar una Transacción
+    /// </summary>
+    /// <param name="id">Identificador de la Transacción</param>
+    /// <param name="request">Datos de la Transacción a actualizar</param>
+    /// <returns>Transacción actualizada o null si no existe</returns>
+    public async Task<TransaccionResponse?> ActualizarTransaccionAsync(Guid id, ActualizarTransaccionRequest request)
+    {
+        TransaccionEntidad datosActualizados = new()
+        {
+            TipoTransaccion = request.TipoTransaccion,
+            ProductoId = request.ProductoId,
+            Cantidad = request.Cantidad,
+            PrecioUnitario = request.PrecioUnitario,
+            PrecioTotal = request.Cantidad * request.PrecioUnitario,
+            Detalle = request.Detalle
+        };
+
+        TransaccionEntidad? transaccion = await _transaccionRepositorio.ActualizarTransaccionAsync(id, datosActualizados);
+        if (transaccion is null)
+        {
+            return null;
+        }
+
+        return new TransaccionResponse
+        {
+            Id = transaccion.Id,
+            Fecha = transaccion.Fecha,
+            TipoTransaccion = transaccion.TipoTransaccion,
+            ProductoId = transaccion.ProductoId,
+            Cantidad = transaccion.Cantidad,
+            PrecioUnitario = transaccion.PrecioUnitario,
+            PrecioTotal = transaccion.PrecioTotal,
+            Detalle = transaccion.Detalle
+        };
+    }
 }
