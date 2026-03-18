@@ -1,3 +1,5 @@
+using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Responses;
+using Sistema.Inventario.Transaccion.Dominio.Entidades;
 using Sistema.Inventario.Transaccion.Infraestructura.Repositorios;
 
 namespace Sistema.Inventario.Transaccion.Aplicacion.Servicios;
@@ -19,5 +21,25 @@ public class TransaccionServicio : ITransaccionServicio
     public TransaccionServicio(ITransaccionRepositorio transaccionRepositorio)
     {
         _transaccionRepositorio = transaccionRepositorio;
+    }
+
+    /// <summary>
+    /// Método para obtener la lista de Transacciones
+    /// </summary>
+    /// <returns>Lista de transacciones</returns>
+    public async Task<List<TransaccionResponse>> ObtenerTransaccionesAsync()
+    {
+        List<TransaccionEntidad> transacciones = await _transaccionRepositorio.ObtenerTransaccionesAsync();
+        return transacciones.Select(transaccion => new TransaccionResponse
+        {
+            Id = transaccion.Id,
+            Fecha = transaccion.Fecha,
+            TipoTransaccion = transaccion.TipoTransaccion,
+            ProductoId = transaccion.ProductoId,
+            Cantidad = transaccion.Cantidad,
+            PrecioUnitario = transaccion.PrecioUnitario,
+            PrecioTotal = transaccion.PrecioTotal,
+            Detalle = transaccion.Detalle
+        }).ToList();
     }
 }

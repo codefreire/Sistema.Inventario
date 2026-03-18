@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using Sistema.Inventario.Transaccion.Infraestructura.Persistencia;
+using Sistema.Inventario.Transaccion.Dominio.Entidades;
 
 namespace Sistema.Inventario.Transaccion.Infraestructura.Repositorios;
 
@@ -19,5 +21,14 @@ public class TransaccionRepositorio : ITransaccionRepositorio
     public TransaccionRepositorio(TransaccionDbContext contexto)
     {
         _contexto = contexto;
+    }
+
+    /// <summary>
+    /// Método para obtener la lista de Transacciones
+    /// </summary>
+    /// <returns>Lista de transacciones</returns>
+    public async Task<List<TransaccionEntidad>> ObtenerTransaccionesAsync()
+    {
+        return await _contexto.Transacciones.AsNoTracking().ToListAsync();
     }
 }

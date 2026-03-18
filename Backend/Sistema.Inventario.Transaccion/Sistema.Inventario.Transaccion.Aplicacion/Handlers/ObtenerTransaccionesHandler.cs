@@ -1,3 +1,4 @@
+using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Responses;
 using Sistema.Inventario.Transaccion.Aplicacion.Servicios;
 
 namespace Sistema.Inventario.Transaccion.Aplicacion.Handlers;
@@ -19,5 +20,14 @@ public class ObtenerTransaccionesHandler
     public ObtenerTransaccionesHandler(ITransaccionServicio transaccionServicio)
     {
         _transaccionServicio = transaccionServicio;
+    }
+
+    /// <summary>
+    /// Método para manejar la obtención de la lista de Transacciones
+    /// </summary>
+    /// <returns>Lista de transacciones</returns>
+    public async Task<List<TransaccionResponse>> Handle()
+    {
+        return await _transaccionServicio.ObtenerTransaccionesAsync();
     }
 }
