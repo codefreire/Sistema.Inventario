@@ -20,6 +20,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("PoliticaFrontend");
+
 app.MapControllers();
 
 app.Run();

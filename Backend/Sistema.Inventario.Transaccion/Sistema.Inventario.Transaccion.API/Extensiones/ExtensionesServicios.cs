@@ -25,6 +25,20 @@ public static class ExtensionesServicios
         servicios.AddDbContext<TransaccionDbContext>(opciones =>
             opciones.UseSqlServer(configuracion.GetConnectionString("cnInventarioTransaccionesBD")));
 
+        string[] origenesPermitidos = configuracion.GetSection("Cors:origenesPermitidos").Get<string[]>() ?? Array.Empty<string>();
+        servicios.AddCors(opciones =>
+        {
+            opciones.AddPolicy("PoliticaFrontend", politica =>
+            {
+                if (origenesPermitidos.Length > 0)
+                {
+                    politica.WithOrigins(origenesPermitidos)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                }
+            });
+        });
+
         servicios.AddScoped<ITransaccionRepositorio, TransaccionRepositorio>();
         servicios.AddScoped<ITransaccionServicio, TransaccionServicio>();
         servicios.AddScoped<ObtenerTransaccionesHandler>();
