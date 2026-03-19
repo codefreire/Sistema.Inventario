@@ -1,6 +1,8 @@
+using System.Reflection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 using Sistema.Inventario.Transaccion.Aplicacion.Handlers;
 using Sistema.Inventario.Transaccion.Aplicacion.Servicios;
 using Sistema.Inventario.Transaccion.Aplicacion.Validators;
@@ -37,6 +39,25 @@ public static class ExtensionesServicios
                         .AllowAnyMethod();
                 }
             });
+        });
+
+        servicios.AddSwaggerGen(opciones =>
+        {
+            opciones.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "API Microservicio de Transacciones",
+                Version = "v1",
+                Description = "Microservicio para la gestión de transacciones en el sistema de inventario",
+                Contact = new OpenApiContact
+                {
+                    Name = "Carlos Freire",
+                    Email = "freirece@produbanco.com"
+                }
+            });
+
+            string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            opciones.IncludeXmlComments(xmlPath);
         });
 
         servicios.AddScoped<ITransaccionRepositorio, TransaccionRepositorio>();
