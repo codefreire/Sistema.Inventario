@@ -9,7 +9,7 @@ namespace Sistema.Inventario.Producto.API.Controllers;
 /// Controlador para manejar las operaciones de los Productos
 /// </summary>
 [ApiController]
-[Route("api/productos")]
+[Route("api/[controller]")]
 public class ProductosController : ControllerBase
 {
     /// <summary>

@@ -8,7 +8,7 @@ namespace Sistema.Inventario.Transaccion.API.Controllers;
 /// Controlador para manejar las operaciones de las Transacciones
 /// </summary>
 [ApiController]
-[Route("api/transacciones")]
+[Route("api/[controller]")]
 public class TransaccionesController : ControllerBase
 {
     /// <summary>

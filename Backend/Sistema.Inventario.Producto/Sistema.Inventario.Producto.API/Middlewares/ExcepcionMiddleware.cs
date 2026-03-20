@@ -1,1 +1,0 @@
-namespace Sistema.Inventario.Producto.API.Middlewares;

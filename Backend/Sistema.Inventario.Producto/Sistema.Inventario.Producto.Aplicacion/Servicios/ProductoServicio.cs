@@ -16,12 +16,19 @@ public class ProductoServicio : IProductoServicio
     private readonly IProductoRepositorio _productoRepositorio;
 
     /// <summary>
+    /// Servicio de logging para mostrar eventos
+    /// </summary>
+    private readonly ILogger<ProductoServicio> _logger;
+
+    /// <summary>
     /// Constructor del servicio para manejar la lógica de negocio de Productos
     /// </summary>
     /// <param name="productoRepositorio">Repositorio para acceder a los datos de Productos</param>
-    public ProductoServicio(IProductoRepositorio productoRepositorio)
+    /// <param name="logger">Logging para registrar eventos del servicio</param>
+    public ProductoServicio(IProductoRepositorio productoRepositorio, ILogger<ProductoServicio> logger)
     {
         _productoRepositorio = productoRepositorio;
+        _logger = logger;
     }
 
     /// <summary>
@@ -30,17 +37,25 @@ public class ProductoServicio : IProductoServicio
     /// <returns>Lista de productos</returns>
     public async Task<List<ProductoResponse>> ObtenerProductosAsync()
     {
-        List<ProductoEntidad> productos = await _productoRepositorio.ObtenerProductosAsync();
-        return productos.Select(producto => new ProductoResponse
+        try
         {
-            Id = producto.Id,
-            Nombre = producto.Nombre,
-            Descripcion = producto.Descripcion,
-            Categoria = producto.Categoria,
-            ImagenUrl = producto.ImagenUrl,
-            Precio = producto.Precio,
-            Stock = producto.Stock
-        }).ToList();
+            List<ProductoEntidad> productos = await _productoRepositorio.ObtenerProductosAsync();
+            return productos.Select(producto => new ProductoResponse
+            {
+                Id = producto.Id,
+                Nombre = producto.Nombre,
+                Descripcion = producto.Descripcion,
+                Categoria = producto.Categoria,
+                ImagenUrl = producto.ImagenUrl,
+                Precio = producto.Precio,
+                Stock = producto.Stock
+            }).ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error inesperado al obtener la lista de productos.");
+            throw;
+        }
     }
 
     /// <summary>
@@ -50,21 +65,31 @@ public class ProductoServicio : IProductoServicio
     /// <returns>Producto encontrado o null si no existe</returns>
     public async Task<ProductoResponse?> ObtenerProductoPorIdAsync(Guid id)
     {
-        ProductoEntidad? producto = await _productoRepositorio.ObtenerProductoPorIdAsync(id);
-        if (producto is null)
+        try
         {
-            return null;
+            ProductoEntidad? producto = await _productoRepositorio.ObtenerProductoPorIdAsync(id);
+            if (producto is null)
+            {
+                _logger.LogWarning("No se encontro el producto con Id {ProductoId}.", id);
+                return null;
+            }
+
+            return new ProductoResponse
+            {
+                Id = producto.Id,
+                Nombre = producto.Nombre,
+                Descripcion = producto.Descripcion,
+                Categoria = producto.Categoria,
+                ImagenUrl = producto.ImagenUrl,
+                Precio = producto.Precio,
+                Stock = producto.Stock
+            };
         }
-        return new ProductoResponse
+        catch (Exception ex)
         {
-            Id = producto.Id,
-            Nombre = producto.Nombre,
-            Descripcion = producto.Descripcion,
-            Categoria = producto.Categoria,
-            ImagenUrl = producto.ImagenUrl,
-            Precio = producto.Precio,
-            Stock = producto.Stock
-        };
+            _logger.LogError(ex, "Error inesperado al obtener el producto con Id {ProductoId}.", id);
+            throw;
+        }
     }
 
     /// <summary>
@@ -74,29 +99,39 @@ public class ProductoServicio : IProductoServicio
     /// <returns>Producto creado</returns>
     public async Task<ProductoResponse> CrearProductoAsync(CrearProductoRequest request)
     {
-        ProductoEntidad producto = new()
+        try
         {
-            Id = Guid.NewGuid(),
-            Nombre = request.Nombre,
-            Descripcion = request.Descripcion,
-            Categoria = request.Categoria,
-            ImagenUrl = request.ImagenUrl,
-            Precio = request.Precio,
-            Stock = request.Stock
-        };
+            ProductoEntidad producto = new()
+            {
+                Id = Guid.NewGuid(),
+                Nombre = request.Nombre,
+                Descripcion = request.Descripcion,
+                Categoria = request.Categoria,
+                ImagenUrl = request.ImagenUrl,
+                Precio = request.Precio,
+                Stock = request.Stock
+            };
 
-        await _productoRepositorio.CrearProductoAsync(producto);
+            await _productoRepositorio.CrearProductoAsync(producto);
 
-        return new ProductoResponse
+            _logger.LogInformation("Producto creado correctamente con Id {ProductoId}.", producto.Id);
+
+            return new ProductoResponse
+            {
+                Id = producto.Id,
+                Nombre = producto.Nombre,
+                Descripcion = producto.Descripcion,
+                Categoria = producto.Categoria,
+                ImagenUrl = producto.ImagenUrl,
+                Precio = producto.Precio,
+                Stock = producto.Stock
+            };
+        }
+        catch (Exception ex)
         {
-            Id = producto.Id,
-            Nombre = producto.Nombre,
-            Descripcion = producto.Descripcion,
-            Categoria = producto.Categoria,
-            ImagenUrl = producto.ImagenUrl,
-            Precio = producto.Precio,
-            Stock = producto.Stock
-        };
+            _logger.LogError(ex, "Error inesperado al crear el producto {NombreProducto}.", request.Nombre);
+            throw;
+        }
     }
 
     /// <summary>
@@ -107,32 +142,43 @@ public class ProductoServicio : IProductoServicio
     /// <returns>Producto actualizado o null si no existe</returns>
     public async Task<ProductoResponse?> ActualizarProductoAsync(Guid id, ActualizarProductoRequest request)
     {
-        ProductoEntidad datosActualizados = new()
+        try
         {
-            Nombre = request.Nombre,
-            Descripcion = request.Descripcion,
-            Categoria = request.Categoria,
-            ImagenUrl = request.ImagenUrl,
-            Precio = request.Precio,
-            Stock = request.Stock
-        };
+            ProductoEntidad datosActualizados = new()
+            {
+                Nombre = request.Nombre,
+                Descripcion = request.Descripcion,
+                Categoria = request.Categoria,
+                ImagenUrl = request.ImagenUrl,
+                Precio = request.Precio,
+                Stock = request.Stock
+            };
 
-        ProductoEntidad? producto = await _productoRepositorio.ActualizarProductoAsync(id, datosActualizados);
-        if (producto is null)
-        {
-            return null;
+            ProductoEntidad? producto = await _productoRepositorio.ActualizarProductoAsync(id, datosActualizados);
+            if (producto is null)
+            {
+                _logger.LogWarning("No se encontro el producto con Id {ProductoId} para actualizar.", id);
+                return null;
+            }
+
+            _logger.LogInformation("Producto actualizado correctamente con Id {ProductoId}.", id);
+
+            return new ProductoResponse
+            {
+                Id = producto.Id,
+                Nombre = producto.Nombre,
+                Descripcion = producto.Descripcion,
+                Categoria = producto.Categoria,
+                ImagenUrl = producto.ImagenUrl,
+                Precio = producto.Precio,
+                Stock = producto.Stock
+            };
         }
-
-        return new ProductoResponse
+        catch (Exception ex)
         {
-            Id = producto.Id,
-            Nombre = producto.Nombre,
-            Descripcion = producto.Descripcion,
-            Categoria = producto.Categoria,
-            ImagenUrl = producto.ImagenUrl,
-            Precio = producto.Precio,
-            Stock = producto.Stock
-        };
+            _logger.LogError(ex, "Error inesperado al actualizar el producto con Id {ProductoId}.", id);
+            throw;
+        }
     }
 
     /// <summary>
@@ -142,6 +188,22 @@ public class ProductoServicio : IProductoServicio
     /// <returns>True si fue eliminado, false si no existe</returns>
     public async Task<bool> EliminarProductoAsync(Guid id)
     {
-        return await _productoRepositorio.EliminarProductoAsync(id);
+        try
+        {
+            bool eliminado = await _productoRepositorio.EliminarProductoAsync(id);
+            if (!eliminado)
+            {
+                _logger.LogWarning("No se encontro el producto con Id {ProductoId} para eliminar.", id);
+                return false;
+            }
+
+            _logger.LogInformation("Producto eliminado correctamente con Id {ProductoId}.", id);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error inesperado al eliminar el producto con Id {ProductoId}.", id);
+            throw;
+        }
     }
 }

@@ -1,1 +1,0 @@
-namespace Sistema.Inventario.Transaccion.API.Middlewares;
