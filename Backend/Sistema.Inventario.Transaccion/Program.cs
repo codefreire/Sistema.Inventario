@@ -1,4 +1,5 @@
 using Sistema.Inventario.Transaccion.API.Extensiones;
+using Sistema.Inventario.Transaccion.API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,8 @@ app.UseHttpsRedirection();
 app.UseCors("PoliticaFrontend");
 
 app.UseHealthChecks("/health");
+
+app.UseTiempoRequest();
 
 app.MapControllers();
 
