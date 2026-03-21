@@ -70,7 +70,7 @@ public class ProductoServicio : IProductoServicio
             ProductoEntidad? producto = await _productoRepositorio.ObtenerProductoPorIdAsync(id);
             if (producto is null)
             {
-                _logger.LogWarning("No se encontro el producto con Id {ProductoId}.", id);
+                _logger.LogWarning($"No se encontro el producto con Id {id}.");
                 return null;
             }
 
@@ -87,7 +87,7 @@ public class ProductoServicio : IProductoServicio
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error inesperado al obtener el producto con Id {ProductoId}.", id);
+            _logger.LogError(ex, $"Error inesperado al obtener el producto con Id {id}.");
             throw;
         }
     }
@@ -114,7 +114,7 @@ public class ProductoServicio : IProductoServicio
 
             await _productoRepositorio.CrearProductoAsync(producto);
 
-            _logger.LogInformation("Producto creado correctamente con Id {ProductoId}.", producto.Id);
+            _logger.LogInformation($"Producto creado correctamente con Id {producto.Id}.");
 
             return new ProductoResponse
             {
@@ -129,7 +129,7 @@ public class ProductoServicio : IProductoServicio
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error inesperado al crear el producto {NombreProducto}.", request.Nombre);
+            _logger.LogError(ex, $"Error inesperado al crear el producto {request.Nombre}.");
             throw;
         }
     }
@@ -157,11 +157,11 @@ public class ProductoServicio : IProductoServicio
             ProductoEntidad? producto = await _productoRepositorio.ActualizarProductoAsync(id, datosActualizados);
             if (producto is null)
             {
-                _logger.LogWarning("No se encontro el producto con Id {ProductoId} para actualizar.", id);
+                _logger.LogWarning($"No se encontro el producto con Id {id} para actualizar.");
                 return null;
             }
 
-            _logger.LogInformation("Producto actualizado correctamente con Id {ProductoId}.", id);
+            _logger.LogInformation($"Producto actualizado correctamente con Id {id}.");
 
             return new ProductoResponse
             {
@@ -176,7 +176,7 @@ public class ProductoServicio : IProductoServicio
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error inesperado al actualizar el producto con Id {ProductoId}.", id);
+            _logger.LogError(ex, $"Error inesperado al actualizar el producto con Id {id}.");
             throw;
         }
     }
@@ -193,16 +193,16 @@ public class ProductoServicio : IProductoServicio
             bool eliminado = await _productoRepositorio.EliminarProductoAsync(id);
             if (!eliminado)
             {
-                _logger.LogWarning("No se encontro el producto con Id {ProductoId} para eliminar.", id);
+                _logger.LogWarning($"No se encontro el producto con Id {id} para eliminar.");
                 return false;
             }
 
-            _logger.LogInformation("Producto eliminado correctamente con Id {ProductoId}.", id);
+            _logger.LogInformation($"Producto eliminado correctamente con Id {id}.");
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error inesperado al eliminar el producto con Id {ProductoId}.", id);
+            _logger.LogError(ex, $"Error inesperado al eliminar el producto con Id {id}.");
             throw;
         }
     }

@@ -16,12 +16,19 @@ public class TransaccionServicio : ITransaccionServicio
     private readonly ITransaccionRepositorio _transaccionRepositorio;
 
     /// <summary>
+    /// Servicio de logging para mostrar eventos
+    /// </summary>
+    private readonly ILogger<TransaccionServicio> _logger;
+
+    /// <summary>
     /// Constructor del servicio para manejar la lógica de negocio de Transacciones
     /// </summary>
     /// <param name="transaccionRepositorio">Repositorio para acceder a los datos de Transacciones</param>
-    public TransaccionServicio(ITransaccionRepositorio transaccionRepositorio)
+    /// <param name="logger">Servicio de logging para mostrar eventos</param>
+    public TransaccionServicio(ITransaccionRepositorio transaccionRepositorio, ILogger<TransaccionServicio> logger)
     {
         _transaccionRepositorio = transaccionRepositorio;
+        _logger = logger;
     }
 
     /// <summary>
@@ -30,18 +37,26 @@ public class TransaccionServicio : ITransaccionServicio
     /// <returns>Lista de transacciones</returns>
     public async Task<List<TransaccionResponse>> ObtenerTransaccionesAsync()
     {
-        List<TransaccionEntidad> transacciones = await _transaccionRepositorio.ObtenerTransaccionesAsync();
-        return transacciones.Select(transaccion => new TransaccionResponse
+        try
         {
-            Id = transaccion.Id,
-            Fecha = transaccion.Fecha,
-            TipoTransaccion = transaccion.TipoTransaccion,
-            ProductoId = transaccion.ProductoId,
-            Cantidad = transaccion.Cantidad,
-            PrecioUnitario = transaccion.PrecioUnitario,
-            PrecioTotal = transaccion.PrecioTotal,
-            Detalle = transaccion.Detalle
-        }).ToList();
+            List<TransaccionEntidad> transacciones = await _transaccionRepositorio.ObtenerTransaccionesAsync();
+            return transacciones.Select(transaccion => new TransaccionResponse
+            {
+                Id = transaccion.Id,
+                Fecha = transaccion.Fecha,
+                TipoTransaccion = transaccion.TipoTransaccion,
+                ProductoId = transaccion.ProductoId,
+                Cantidad = transaccion.Cantidad,
+                PrecioUnitario = transaccion.PrecioUnitario,
+                PrecioTotal = transaccion.PrecioTotal,
+                Detalle = transaccion.Detalle
+            }).ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al obtener la lista de transacciones.");
+            throw;
+        }
     }
 
     /// <summary>
@@ -51,22 +66,32 @@ public class TransaccionServicio : ITransaccionServicio
     /// <returns>Transacción encontrada o null si no existe</returns>
     public async Task<TransaccionResponse?> ObtenerTransaccionPorIdAsync(Guid id)
     {
-        TransaccionEntidad? transaccion = await _transaccionRepositorio.ObtenerTransaccionPorIdAsync(id);
-        if (transaccion is null)
+        try
         {
-            return null;
+            TransaccionEntidad? transaccion = await _transaccionRepositorio.ObtenerTransaccionPorIdAsync(id);
+            if (transaccion is null)
+            {
+                _logger.LogWarning($"No se encontró la transacción con Id {id}.");
+                return null;
+            }
+
+            return new TransaccionResponse
+            {
+                Id = transaccion.Id,
+                Fecha = transaccion.Fecha,
+                TipoTransaccion = transaccion.TipoTransaccion,
+                ProductoId = transaccion.ProductoId,
+                Cantidad = transaccion.Cantidad,
+                PrecioUnitario = transaccion.PrecioUnitario,
+                PrecioTotal = transaccion.PrecioTotal,
+                Detalle = transaccion.Detalle
+            };
         }
-        return new TransaccionResponse
+        catch (Exception ex)
         {
-            Id = transaccion.Id,
-            Fecha = transaccion.Fecha,
-            TipoTransaccion = transaccion.TipoTransaccion,
-            ProductoId = transaccion.ProductoId,
-            Cantidad = transaccion.Cantidad,
-            PrecioUnitario = transaccion.PrecioUnitario,
-            PrecioTotal = transaccion.PrecioTotal,
-            Detalle = transaccion.Detalle
-        };
+            _logger.LogError(ex, $"Error al obtener la transacción con Id {id}.");
+            throw;
+        }
     }
 
     /// <summary>
@@ -76,31 +101,40 @@ public class TransaccionServicio : ITransaccionServicio
     /// <returns>Transacción creada</returns>
     public async Task<TransaccionResponse> CrearTransaccionAsync(CrearTransaccionRequest request)
     {
-        TransaccionEntidad transaccion = new()
+        try
         {
-            Id = Guid.NewGuid(),
-            Fecha = DateTime.Now,
-            TipoTransaccion = request.TipoTransaccion,
-            ProductoId = request.ProductoId,
-            Cantidad = request.Cantidad,
-            PrecioUnitario = request.PrecioUnitario,
-            PrecioTotal = request.Cantidad * request.PrecioUnitario,
-            Detalle = request.Detalle
-        };
+            TransaccionEntidad transaccion = new()
+            {
+                Id = Guid.NewGuid(),
+                Fecha = DateTime.Now,
+                TipoTransaccion = request.TipoTransaccion,
+                ProductoId = request.ProductoId,
+                Cantidad = request.Cantidad,
+                PrecioUnitario = request.PrecioUnitario,
+                PrecioTotal = request.Cantidad * request.PrecioUnitario,
+                Detalle = request.Detalle
+            };
 
-        await _transaccionRepositorio.CrearTransaccionAsync(transaccion);
+            await _transaccionRepositorio.CrearTransaccionAsync(transaccion);
+            _logger.LogInformation($"Transacción creada con Id {transaccion.Id} para el producto con Id {transaccion.ProductoId}.");
 
-        return new TransaccionResponse
+            return new TransaccionResponse
+            {
+                Id = transaccion.Id,
+                Fecha = transaccion.Fecha,
+                TipoTransaccion = transaccion.TipoTransaccion,
+                ProductoId = transaccion.ProductoId,
+                Cantidad = transaccion.Cantidad,
+                PrecioUnitario = transaccion.PrecioUnitario,
+                PrecioTotal = transaccion.PrecioTotal,
+                Detalle = transaccion.Detalle
+            };
+        }
+        catch (Exception ex)
         {
-            Id = transaccion.Id,
-            Fecha = transaccion.Fecha,
-            TipoTransaccion = transaccion.TipoTransaccion,
-            ProductoId = transaccion.ProductoId,
-            Cantidad = transaccion.Cantidad,
-            PrecioUnitario = transaccion.PrecioUnitario,
-            PrecioTotal = transaccion.PrecioTotal,
-            Detalle = transaccion.Detalle
-        };
+            _logger.LogError(ex, $"Error inesperado al crear la transacción para el producto con Id {request.ProductoId}.");
+            throw;
+        }
     }
 
     /// <summary>
@@ -111,33 +145,45 @@ public class TransaccionServicio : ITransaccionServicio
     /// <returns>Transacción actualizada o null si no existe</returns>
     public async Task<TransaccionResponse?> ActualizarTransaccionAsync(Guid id, ActualizarTransaccionRequest request)
     {
-        TransaccionEntidad datosActualizados = new()
+        try
         {
-            TipoTransaccion = request.TipoTransaccion,
-            ProductoId = request.ProductoId,
-            Cantidad = request.Cantidad,
-            PrecioUnitario = request.PrecioUnitario,
-            PrecioTotal = request.Cantidad * request.PrecioUnitario,
-            Detalle = request.Detalle
-        };
 
-        TransaccionEntidad? transaccion = await _transaccionRepositorio.ActualizarTransaccionAsync(id, datosActualizados);
-        if (transaccion is null)
-        {
-            return null;
+            TransaccionEntidad datosActualizados = new()
+            {
+                TipoTransaccion = request.TipoTransaccion,
+                ProductoId = request.ProductoId,
+                Cantidad = request.Cantidad,
+                PrecioUnitario = request.PrecioUnitario,
+                PrecioTotal = request.Cantidad * request.PrecioUnitario,
+                Detalle = request.Detalle
+            };
+
+            TransaccionEntidad? transaccion = await _transaccionRepositorio.ActualizarTransaccionAsync(id, datosActualizados);
+            if (transaccion is null)
+            {
+                _logger.LogWarning($"No se encontró la transacción con Id {id} para actualizar.");
+                return null;
+            }
+
+            _logger.LogInformation($"Transacción con Id {id} actualizada correctamente.");
+
+            return new TransaccionResponse
+            {
+                Id = transaccion.Id,
+                Fecha = transaccion.Fecha,
+                TipoTransaccion = transaccion.TipoTransaccion,
+                ProductoId = transaccion.ProductoId,
+                Cantidad = transaccion.Cantidad,
+                PrecioUnitario = transaccion.PrecioUnitario,
+                PrecioTotal = transaccion.PrecioTotal,
+                Detalle = transaccion.Detalle
+            };
         }
-
-        return new TransaccionResponse
+        catch (Exception ex)
         {
-            Id = transaccion.Id,
-            Fecha = transaccion.Fecha,
-            TipoTransaccion = transaccion.TipoTransaccion,
-            ProductoId = transaccion.ProductoId,
-            Cantidad = transaccion.Cantidad,
-            PrecioUnitario = transaccion.PrecioUnitario,
-            PrecioTotal = transaccion.PrecioTotal,
-            Detalle = transaccion.Detalle
-        };
+            _logger.LogError(ex, $"Error inesperado al actualizar la transacción con Id {id}.");
+            throw;
+        }
     }
 
     /// <summary>
@@ -147,6 +193,22 @@ public class TransaccionServicio : ITransaccionServicio
     /// <returns>True si fue eliminada, false si no existe</returns>
     public async Task<bool> EliminarTransaccionAsync(Guid id)
     {
-        return await _transaccionRepositorio.EliminarTransaccionAsync(id);
+        try
+        {
+            bool eliminado = await _transaccionRepositorio.EliminarTransaccionAsync(id);
+            if (!eliminado)
+            {
+                _logger.LogWarning($"No se encontró la transacción con Id {id} para eliminar.");
+                return false;
+            }
+
+            _logger.LogInformation($"Transacción con Id {id} eliminada correctamente.");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error inesperado al eliminar la transacción con Id {id}.");
+            throw;
+        }
     }
 }
