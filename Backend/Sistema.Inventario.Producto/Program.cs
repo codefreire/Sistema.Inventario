@@ -22,6 +22,8 @@ app.UseHttpsRedirection();
 
 app.UseCors("PoliticaFrontend");
 
+app.UseHealthChecks("/health");
+
 app.MapControllers();
 
 app.Run();
