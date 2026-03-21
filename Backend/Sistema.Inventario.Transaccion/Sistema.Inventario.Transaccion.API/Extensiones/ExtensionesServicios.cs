@@ -24,6 +24,8 @@ public static class ExtensionesServicios
     /// <returns>Colección de servicios</returns>
     public static IServiceCollection AddTransacciones(this IServiceCollection servicios, IConfiguration configuracion)
     {
+        servicios.AddHealthChecks();
+
         servicios.AddLogging();
 
         servicios.AddDbContext<TransaccionDbContext>(opciones =>
