@@ -5,11 +5,11 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{1AE8ACA6-933B-BF2A-3671-3E2EAC007D16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sistema.Inventario.Producto", "Backend\Sistema.Inventario.Producto\Sistema.Inventario.Producto.csproj", "{E0D6785E-0C08-4F22-DD46-C367F288A9F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sistema.Inventario.Producto", "Backend\Microservicios\Sistema.Inventario.Producto\Sistema.Inventario.Producto.csproj", "{E0D6785E-0C08-4F22-DD46-C367F288A9F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sistema.Inventario.Transaccion", "Backend\Sistema.Inventario.Transaccion\Sistema.Inventario.Transaccion.csproj", "{B4C0C626-D61A-4FD7-B607-9F9724C94B8E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sistema.Inventario.Transaccion", "Backend\Microservicios\Sistema.Inventario.Transaccion\Sistema.Inventario.Transaccion.csproj", "{B4C0C626-D61A-4FD7-B607-9F9724C94B8E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sistema.Inventario.ApiGateway", "Backend\Sistema.Inventario.ApiGateway\Sistema.Inventario.ApiGateway.csproj", "{9580CF3E-C83C-4485-A622-EF0954D1BB49}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sistema.Inventario.ApiGateway", "Backend\Gateway\Sistema.Inventario.ApiGateway\Sistema.Inventario.ApiGateway.csproj", "{9580CF3E-C83C-4485-A622-EF0954D1BB49}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
