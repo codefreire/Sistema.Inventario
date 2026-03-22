@@ -26,8 +26,6 @@ public static class ExtensionesServicios
     {
         servicios.AddHealthChecks();
 
-        servicios.AddLogging();
-
         servicios.AddDbContext<TransaccionDbContext>(opciones =>
             opciones.UseSqlServer(configuracion.GetConnectionString("cnInventarioTransaccionesBD")));
 
