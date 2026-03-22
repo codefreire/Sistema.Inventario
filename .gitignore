@@ -904,3 +904,6 @@ dist-ssr
 *.njsproj
 # *.sln
 *.sw?
+
+
+logs/
