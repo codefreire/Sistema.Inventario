@@ -25,8 +25,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("PoliticaFrontend");
-
 app.UseHealthChecks("/health");
 
 app.UseTiempoRequest();
