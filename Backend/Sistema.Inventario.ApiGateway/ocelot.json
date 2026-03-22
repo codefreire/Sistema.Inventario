@@ -1,0 +1,55 @@
+{
+    "Routes": [
+        {
+            "DownstreamPathTemplate": "/api/productos/{everything}",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                { 
+                    "Host": "localhost",
+                    "Port": 5261
+                }
+            ],
+            "UpstreamPathTemplate": "/api/productos/{everything}",
+            "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+            "SwaggerKey": "productos"
+        },
+        {
+            "DownstreamPathTemplate": "/api/transacciones/{everything}",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 5253
+                }
+            ],
+            "UpstreamPathTemplate": "/api/transacciones/{everything}",
+            "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+            "SwaggerKey": "transacciones"
+        }
+    ],
+    "SwaggerEndPoints": [
+        {
+            "Key": "productos",
+            "Config": [
+                {
+                    "Name": "Productos API",
+                    "Version": "v1",
+                    "Url": "http://localhost:5261/swagger/v1/swagger.json"
+                }
+            ]
+        },
+        {
+            "Key": "transacciones",
+            "Config": [
+                {
+                    "Name": "Transacciones API",
+                    "Version": "v1",
+                    "Url": "http://localhost:5253/swagger/v1/swagger.json"
+                }
+            ]
+        }
+    ],
+    "GlobalConfiguration": {
+        "BaseUrl": "http://localhost:7000"
+    }
+}
