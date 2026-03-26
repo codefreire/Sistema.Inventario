@@ -227,6 +227,9 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
     /// <summary>
     /// Inserta datos de prueba en la base de datos en memoria
     /// </summary>
+    /// <param name="nombre">Nombre del producto a insertar</param>
+    /// <param name="precio">Precio del producto a insertar</param>
+    /// <param name="stock">Stock del producto a insertar</param>
     private async Task InsertarProductoAsync(string nombre, decimal precio, int stock)
     {
         using IServiceScope scope = _factory.Services.CreateScope();
