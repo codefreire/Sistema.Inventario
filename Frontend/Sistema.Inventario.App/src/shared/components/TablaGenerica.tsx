@@ -15,6 +15,34 @@ interface TablaGenericaProps<T> {
   mensajeVacio?: string;
 }
 
+/**
+ * Tabla reutilizable tipada con genericos para renderizar colecciones heterogeneas.
+ *
+ * Uso de generico `T`:
+ * - columnas puede leer propiedades de `T` con `keyof T`.
+ * - accesor tambien admite una funcion para renderizado personalizado por fila.
+ * - claveFila recibe `T` para generar una clave unica por registro.
+ *
+ * @template T Tipo de dato de cada fila.
+ * @param {TablaGenericaProps<T>} props Propiedades de configuracion de la tabla.
+ * @param {ColumnaTabla<T>[]} props.columnas Definicion de columnas (encabezado, accesor y ancho opcional).
+ * @param {T[]} props.datos Datos a renderizar en el cuerpo de la tabla.
+ * @param {(item: T) => string} props.claveFila Funcion para obtener una clave unica por fila.
+ * @param {(item: T) => ReactNode} [props.acciones] Renderizador opcional de acciones por fila.
+ * @param {boolean} [props.cargando=false] Indica si debe mostrarse el estado de carga.
+ * @param {string} [props.mensajeVacio='No se encontraron registros.'] Mensaje a mostrar cuando no hay datos.
+ * @returns {JSX.Element} Tabla renderizada o mensajes de estado (cargando/vacio).
+ *
+ * @example
+ * <TablaGenerica
+ *   columnas={[
+ *     { encabezado: 'Nombre', accesor: 'nombre' },
+ *     { encabezado: 'Precio', accesor: (p) => `$${p.precio.toFixed(2)}` },
+ *   ]}
+ *   datos={productos}
+ *   claveFila={(p) => p.id}
+ * />
+ */
 export default function TablaGenerica<T>({
   columnas,
   datos,
