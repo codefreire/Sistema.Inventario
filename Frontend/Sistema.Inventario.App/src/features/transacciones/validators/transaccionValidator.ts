@@ -8,6 +8,33 @@ export interface ErroresTransaccion {
   detalle?: string;
 }
 
+/**
+ * Valida una transaccion de inventario antes de enviarla al backend.
+ *
+ * Casos relevantes y bordes cubiertos:
+ * - El tipo solo admite `Compra` o `Venta` (no sensible a mayusculas).
+ * - En ventas, la cantidad no puede superar el `stockDisponible` cuando se proporciona.
+ * - Cantidad debe ser entero positivo.
+ * - Precio unitario no puede ser negativo ni exceder el maximo permitido.
+ * - Detalle obligatorio con longitud maxima.
+ *
+ * @param {CrearTransaccionRequest} transaccion Datos de la transaccion a validar.
+ * @param {number} [stockDisponible] Stock actual del producto para validar ventas.
+ * @returns {ErroresTransaccion} Objeto con mensajes de error por campo; vacio cuando la entrada es valida.
+ * @throws {TypeError} Si `transaccion` es `null` o `undefined` en tiempo de ejecucion.
+ *
+ * @example
+ * const errores = validarTransaccion(
+ *   {
+ *     tipoTransaccion: 'Venta',
+ *     productoId: 'prod-001',
+ *     cantidad: 3,
+ *     precioUnitario: 12.5,
+ *     detalle: 'Venta mostrador',
+ *   },
+ *   10
+ * );
+ */
 export function validarTransaccion(
   transaccion: CrearTransaccionRequest,
   stockDisponible?: number

@@ -9,6 +9,29 @@ export interface ErroresProducto {
   stock?: string;
 }
 
+/**
+ * Valida los campos requeridos de un producto antes de crearlo o actualizarlo.
+ *
+ * Reglas aplicadas:
+ * - Texto obligatorio y longitud maxima para nombre, descripcion y categoria.
+ * - URL valida para imagen.
+ * - Precio dentro del rango permitido.
+ * - Stock entero y no negativo.
+ *
+ * @param {CrearProductoRequest} producto Datos del producto a validar.
+ * @returns {ErroresProducto} Objeto con errores por campo. Si no hay errores, retorna un objeto vacio.
+ * @throws {TypeError} Si `producto` es `null` o `undefined` en tiempo de ejecucion.
+ *
+ * @example
+ * const errores = validarProducto({
+ *   nombre: 'Laptop',
+ *   descripcion: 'Equipo de oficina',
+ *   categoria: 'Tecnologia',
+ *   imagenUrl: 'https://cdn.ejemplo.com/laptop.png',
+ *   precio: 1250,
+ *   stock: 10,
+ * });
+ */
 export function validarProducto(producto: CrearProductoRequest): ErroresProducto {
   const errores: ErroresProducto = {};
 

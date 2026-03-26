@@ -4,6 +4,35 @@ import type { Producto, FiltrosProducto } from '../types/Producto';
 
 const ELEMENTOS_POR_PAGINA = 5;
 
+/**
+ * Hook para gestionar el listado de productos con carga remota, filtros y paginacion.
+ *
+ * Estado gestionado internamente:
+ * - productos: lista base obtenida desde el servicio.
+ * - productosFiltrados: lista resultante tras aplicar filtros.
+ * - cargando y error: estado de ciclo de vida de la carga.
+ * - paginaActual: pagina activa para el recorte de resultados.
+ * - filtros: criterios de busqueda por nombre, categoria, precio y stock.
+ *
+ * @param {void} _ No recibe parametros.
+ * @returns {{
+ *   productos: Producto[];
+ *   totalProductos: number;
+ *   cargando: boolean;
+ *   error: string | null;
+ *   paginaActual: number;
+ *   totalPaginas: number;
+ *   filtros: FiltrosProducto;
+ *   setPaginaActual: import('react').Dispatch<import('react').SetStateAction<number>>;
+ *   setFiltros: import('react').Dispatch<import('react').SetStateAction<FiltrosProducto>>;
+ *   recargar: () => Promise<void>;
+ * }} Estado y acciones para renderizar, filtrar, paginar y recargar productos.
+ *
+ * @example
+ * const { productos, filtros, setFiltros, paginaActual, setPaginaActual } = useProductos();
+ * setFiltros((prev) => ({ ...prev, categoria: 'Electronica' }));
+ * setPaginaActual(2);
+ */
 export function useProductos() {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [productosFiltrados, setProductosFiltrados] = useState<Producto[]>([]);

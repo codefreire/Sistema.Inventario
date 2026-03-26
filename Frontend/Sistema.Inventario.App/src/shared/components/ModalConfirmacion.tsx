@@ -8,6 +8,32 @@ interface ModalConfirmacionProps {
   onCancelar: () => void;
 }
 
+/**
+ * Modal de confirmacion para acciones potencialmente destructivas o sensibles.
+ *
+ * Comportamiento:
+ * - Si `visible` es `false`, no renderiza contenido.
+ * - Cierra al hacer clic en el fondo (`onCancelar`).
+ * - Evita el cierre al hacer clic dentro del contenido del modal.
+ * - Expone acciones explicitas de cancelar y confirmar.
+ *
+ * @param {ModalConfirmacionProps} props Propiedades del componente.
+ * @param {boolean} props.visible Controla si el modal se muestra.
+ * @param {string} props.titulo Titulo principal del cuadro de dialogo.
+ * @param {string} props.mensaje Mensaje descriptivo de la confirmacion.
+ * @param {() => void} props.onConfirmar Callback al confirmar la accion.
+ * @param {() => void} props.onCancelar Callback al cancelar o cerrar el modal.
+ * @returns {JSX.Element | null} Estructura del modal cuando esta visible, o `null` cuando no lo esta.
+ *
+ * @example
+ * <ModalConfirmacion
+ *   visible={mostrarModal}
+ *   titulo="Eliminar producto"
+ *   mensaje="Esta accion no se puede deshacer."
+ *   onConfirmar={eliminarProducto}
+ *   onCancelar={() => setMostrarModal(false)}
+ * />
+ */
 export default function ModalConfirmacion({
   visible,
   titulo,
