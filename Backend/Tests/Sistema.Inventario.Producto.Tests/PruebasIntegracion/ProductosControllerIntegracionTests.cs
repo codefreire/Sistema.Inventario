@@ -6,10 +6,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 using Sistema.Inventario.Producto.Aplicacion.DTOs.Requests;
 using Sistema.Inventario.Producto.Aplicacion.DTOs.Responses;
 using Sistema.Inventario.Producto.Dominio.Entidades;
 using Sistema.Inventario.Producto.Infraestructura.Persistencia;
+using Sistema.Inventario.Storage.DTOs;
+using Sistema.Inventario.Storage.Servicios;
 
 namespace Sistema.Inventario.Producto.Tests.PruebasIntegracion;
 
@@ -23,6 +26,11 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
     /// WebApplicationFactory configurada para usar EF Core InMemory y ambiente de Testing
     /// </summary>
     private readonly WebApplicationFactory<Program> _factory;
+
+    /// <summary>
+    /// Mock del servicio de almacenamiento para evitar I/O real en pruebas de integración
+    /// </summary>
+    private readonly Mock<IAlmacenamientoServicio> _almacenamientoServicioMock = new();
 
     /// <summary>
     /// Constructor que configura WebApplicationFactory para usar EF Core InMemory y ambiente de Testing
@@ -41,6 +49,9 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
 
                 servicios.AddDbContext<ProductoDbContext>(opciones =>
                     opciones.UseInMemoryDatabase("InventarioProductosTestBD"));
+
+                servicios.RemoveAll<IAlmacenamientoServicio>();
+                servicios.AddSingleton(_almacenamientoServicioMock.Object);
             });
         });
     }
@@ -247,5 +258,69 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
         });
 
         await contextoDb.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Valida que POST /api/productos/imagenes con archivo válido retorne 200 OK con la URL pública
+    /// </summary>
+    [Fact]
+    public async Task SubirImagen_CuandoArchivoValido_Retorna200ConImagenUrl()
+    {
+        // ARRANGE: Configurar mock del servicio de almacenamiento con respuesta exitosa
+        string urlEsperada = "http://localhost:5261/uploads/test-uuid.jpg";
+        _almacenamientoServicioMock
+            .Setup(s => s.GuardarArchivoAsync(It.IsAny<SubirArchivoRequest>()))
+            .ReturnsAsync(new ArchivoSubidoResponse
+            {
+                NombreArchivo = "test-uuid.jpg",
+                UrlPublica = urlEsperada,
+                TipoContenido = "image/jpeg",
+                TamanoBytes = 1024
+            });
+
+        using HttpClient cliente = _factory.CreateClient();
+
+        byte[] contenidoArchivo = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 }; // cabecera JPEG mínima
+        using ByteArrayContent bytesArchivo = new(contenidoArchivo);
+        bytesArchivo.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
+
+        using MultipartFormDataContent formulario = new();
+        formulario.Add(bytesArchivo, "archivo", "producto.jpg");
+
+        // ACT: Realizar POST multipart al endpoint de imágenes
+        HttpResponseMessage respuesta = await cliente.PostAsync("/api/productos/imagenes", formulario);
+
+        // ASSERT: Verificar status 200 y que la URL retornada es la del servicio
+        Assert.Equal(HttpStatusCode.OK, respuesta.StatusCode);
+        SubirImagenResponse? contenido = await respuesta.Content.ReadFromJsonAsync<SubirImagenResponse>();
+        Assert.NotNull(contenido);
+        Assert.Equal(urlEsperada, contenido!.ImagenUrl);
+    }
+
+    /// <summary>
+    /// Valida que POST /api/productos/imagenes retorne 400 BadRequest cuando el servicio rechaza el archivo
+    /// </summary>
+    [Fact]
+    public async Task SubirImagen_CuandoServicioRechazaArchivo_Retorna400()
+    {
+        // ARRANGE: Configurar mock del servicio para lanzar ArgumentException
+        _almacenamientoServicioMock
+            .Setup(s => s.GuardarArchivoAsync(It.IsAny<SubirArchivoRequest>()))
+            .ThrowsAsync(new ArgumentException("La extensión del archivo no está permitida. Use jpg, jpeg, png o webp."));
+
+        using HttpClient cliente = _factory.CreateClient();
+
+        byte[] contenidoArchivo = new byte[] { 0x4D, 0x5A }; // cabecera EXE
+        using ByteArrayContent bytesArchivo = new(contenidoArchivo);
+        bytesArchivo.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+
+        using MultipartFormDataContent formulario = new();
+        formulario.Add(bytesArchivo, "archivo", "malware.exe");
+
+        // ACT: Realizar POST multipart con archivo inválido
+        HttpResponseMessage respuesta = await cliente.PostAsync("/api/productos/imagenes", formulario);
+
+        // ASSERT: Verificar que retorna 400 BadRequest
+        Assert.Equal(HttpStatusCode.BadRequest, respuesta.StatusCode);
     }
 }

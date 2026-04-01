@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moq;
 using Sistema.Inventario.Producto.Aplicacion.DTOs.Requests;
 using Sistema.Inventario.Producto.Aplicacion.Servicios;
@@ -211,5 +211,233 @@ public class ProductoServicioTests
 
         // ASSERT: Verificar que retorna false
         Assert.False(resultado);
+    }
+
+    /// <summary>
+    /// Valida que el servicio retorne el producto correctamente cuando existe
+    /// </summary>
+    [Fact]
+    public async Task ObtenerProductoPorIdAsync_CuandoExiste_DebeRetornarProducto()
+    {
+        // ARRANGE: Preparar entidad de producto y mock que la devuelve
+        Guid idProducto = Guid.NewGuid();
+        ProductoEntidad entidad = new()
+        {
+            Id = idProducto,
+            Nombre = "Webcam",
+            Descripcion = "Webcam Full HD",
+            Categoria = "Perifericos",
+            ImagenUrl = "https://sistemainventario.com/productos/webcam.png",
+            Precio = 75m,
+            Stock = 12
+        };
+
+        _repositorioProductoMock
+            .Setup(repositorio => repositorio.ObtenerProductoPorIdAsync(idProducto))
+            .ReturnsAsync(entidad);
+
+        ProductoServicio servicio = CrearServicio();
+
+        // ACT: Obtener el producto por su Id
+        Sistema.Inventario.Producto.Aplicacion.DTOs.Responses.ProductoResponse? resultado = await servicio.ObtenerProductoPorIdAsync(idProducto);
+
+        // ASSERT: Verificar que se mapean correctamente todos los campos
+        Assert.NotNull(resultado);
+        Assert.Equal(idProducto, resultado!.Id);
+        Assert.Equal("Webcam", resultado.Nombre);
+        Assert.Equal(75m, resultado.Precio);
+        Assert.Equal(12, resultado.Stock);
+    }
+
+    /// <summary>
+    /// Valida que el servicio retorne null cuando el producto a actualizar no existe
+    /// </summary>
+    [Fact]
+    public async Task ActualizarProductoAsync_CuandoNoExiste_DebeRetornarNull()
+    {
+        // ARRANGE: Configurar mock del repositorio para retornar null
+        Guid idProducto = Guid.NewGuid();
+        ActualizarProductoRequest request = new()
+        {
+            Nombre = "Monitor 24",
+            Descripcion = "Monitor LED",
+            Categoria = "Tecnologia",
+            ImagenUrl = "https://sistemainventario.com/productos/monitor.png",
+            Precio = 300m,
+            Stock = 5
+        };
+
+        _repositorioProductoMock
+            .Setup(repositorio => repositorio.ActualizarProductoAsync(idProducto, It.IsAny<ProductoEntidad>()))
+            .ReturnsAsync((ProductoEntidad?)null);
+
+        ProductoServicio servicio = CrearServicio();
+
+        // ACT: Intentar actualizar un producto que no existe
+        Sistema.Inventario.Producto.Aplicacion.DTOs.Responses.ProductoResponse? resultado = await servicio.ActualizarProductoAsync(idProducto, request);
+
+        // ASSERT: Verificar que retorna null
+        Assert.Null(resultado);
+    }
+
+    /// <summary>
+    /// Valida que el servicio retorne true cuando el producto es eliminado correctamente
+    /// </summary>
+    [Fact]
+    public async Task EliminarProductoAsync_CuandoExiste_DebeRetornarTrue()
+    {
+        // ARRANGE: Configurar mock del repositorio para confirmar eliminacion exitosa
+        Guid idProducto = Guid.NewGuid();
+
+        _repositorioProductoMock
+            .Setup(repositorio => repositorio.EliminarProductoAsync(idProducto))
+            .ReturnsAsync(true);
+
+        ProductoServicio servicio = CrearServicio();
+
+        // ACT: Eliminar el producto existente
+        bool resultado = await servicio.EliminarProductoAsync(idProducto);
+
+        // ASSERT: Verificar que retorna true y se invoco exactamente una vez
+        Assert.True(resultado);
+        _repositorioProductoMock.Verify(repositorio => repositorio.EliminarProductoAsync(idProducto), Times.Once);
+    }
+
+    /// <summary>
+    /// Valida que AjustarStockAsync incremente el stock correctamente en una Compra
+    /// </summary>
+    [Fact]
+    public async Task AjustarStockAsync_CuandoCompra_DebeIncrementarElStock()
+    {
+        // ARRANGE: Producto con stock 10, compra de 5 unidades, nuevo stock esperado 15
+        Guid idProducto = Guid.NewGuid();
+        ProductoEntidad entidadExistente = new()
+        {
+            Id = idProducto,
+            Nombre = "Router",
+            Descripcion = "Router WiFi 6",
+            Categoria = "Redes",
+            ImagenUrl = "https://sistemainventario.com/productos/router.png",
+            Precio = 120m,
+            Stock = 10
+        };
+
+        _repositorioProductoMock
+            .Setup(repositorio => repositorio.ObtenerProductoPorIdAsync(idProducto))
+            .ReturnsAsync(entidadExistente);
+
+        _repositorioProductoMock
+            .Setup(repositorio => repositorio.ActualizarProductoAsync(idProducto, It.IsAny<ProductoEntidad>()))
+            .ReturnsAsync((Guid id, ProductoEntidad actualizado) =>
+            {
+                actualizado.Id = id;
+                return actualizado;
+            });
+
+        ProductoServicio servicio = CrearServicio();
+
+        // ACT: Ajustar stock con tipo Compra
+        Sistema.Inventario.Producto.Aplicacion.DTOs.Responses.ProductoResponse? resultado = await servicio.AjustarStockAsync(idProducto, 5, "Compra");
+
+        // ASSERT: Verificar que el stock se incremento correctamente
+        Assert.NotNull(resultado);
+        Assert.Equal(15, resultado!.Stock);
+    }
+
+    /// <summary>
+    /// Valida que AjustarStockAsync decremente el stock correctamente en una Venta
+    /// </summary>
+    [Fact]
+    public async Task AjustarStockAsync_CuandoVenta_DebeDecrementarElStock()
+    {
+        // ARRANGE: Producto con stock 10, venta de 3 unidades, nuevo stock esperado 7
+        Guid idProducto = Guid.NewGuid();
+        ProductoEntidad entidadExistente = new()
+        {
+            Id = idProducto,
+            Nombre = "Switch",
+            Descripcion = "Switch de red 8 puertos",
+            Categoria = "Redes",
+            ImagenUrl = "https://sistemainventario.com/productos/switch.png",
+            Precio = 80m,
+            Stock = 10
+        };
+
+        _repositorioProductoMock
+            .Setup(repositorio => repositorio.ObtenerProductoPorIdAsync(idProducto))
+            .ReturnsAsync(entidadExistente);
+
+        _repositorioProductoMock
+            .Setup(repositorio => repositorio.ActualizarProductoAsync(idProducto, It.IsAny<ProductoEntidad>()))
+            .ReturnsAsync((Guid id, ProductoEntidad actualizado) =>
+            {
+                actualizado.Id = id;
+                return actualizado;
+            });
+
+        ProductoServicio servicio = CrearServicio();
+
+        // ACT: Ajustar stock con tipo Venta
+        Sistema.Inventario.Producto.Aplicacion.DTOs.Responses.ProductoResponse? resultado = await servicio.AjustarStockAsync(idProducto, 3, "Venta");
+
+        // ASSERT: Verificar que el stock se decremento correctamente
+        Assert.NotNull(resultado);
+        Assert.Equal(7, resultado!.Stock);
+    }
+
+    /// <summary>
+    /// Valida que AjustarStockAsync retorne null cuando el producto no existe
+    /// </summary>
+    [Fact]
+    public async Task AjustarStockAsync_CuandoProductoNoExiste_DebeRetornarNull()
+    {
+        // ARRANGE: Repositorio retorna null para el producto
+        Guid idProducto = Guid.NewGuid();
+
+        _repositorioProductoMock
+            .Setup(repositorio => repositorio.ObtenerProductoPorIdAsync(idProducto))
+            .ReturnsAsync((ProductoEntidad?)null);
+
+        ProductoServicio servicio = CrearServicio();
+
+        // ACT: Intentar ajustar stock de un producto inexistente
+        Sistema.Inventario.Producto.Aplicacion.DTOs.Responses.ProductoResponse? resultado = await servicio.AjustarStockAsync(idProducto, 5, "Venta");
+
+        // ASSERT: Verificar que retorna null sin llamar al repositorio de actualizacion
+        Assert.Null(resultado);
+        _repositorioProductoMock.Verify(repositorio => repositorio.ActualizarProductoAsync(It.IsAny<Guid>(), It.IsAny<ProductoEntidad>()), Times.Never);
+    }
+
+    /// <summary>
+    /// Valida que AjustarStockAsync retorne null cuando el stock es insuficiente para una Venta
+    /// </summary>
+    [Fact]
+    public async Task AjustarStockAsync_CuandoStockInsuficienteParaVenta_DebeRetornarNull()
+    {
+        // ARRANGE: Producto con stock 2, se intenta vender 5 unidades
+        Guid idProducto = Guid.NewGuid();
+        ProductoEntidad entidadExistente = new()
+        {
+            Id = idProducto,
+            Nombre = "Cable HDMI",
+            Descripcion = "Cable HDMI 2.0",
+            Categoria = "Accesorios",
+            ImagenUrl = "https://sistemainventario.com/productos/hdmi.png",
+            Precio = 15m,
+            Stock = 2
+        };
+
+        _repositorioProductoMock
+            .Setup(repositorio => repositorio.ObtenerProductoPorIdAsync(idProducto))
+            .ReturnsAsync(entidadExistente);
+
+        ProductoServicio servicio = CrearServicio();
+
+        // ACT: Intentar vender mas unidades de las disponibles
+        Sistema.Inventario.Producto.Aplicacion.DTOs.Responses.ProductoResponse? resultado = await servicio.AjustarStockAsync(idProducto, 5, "Venta");
+
+        // ASSERT: Verificar que retorna null sin intentar actualizar
+        Assert.Null(resultado);
+        _repositorioProductoMock.Verify(repositorio => repositorio.ActualizarProductoAsync(It.IsAny<Guid>(), It.IsAny<ProductoEntidad>()), Times.Never);
     }
 }
