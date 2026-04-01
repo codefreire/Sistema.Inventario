@@ -14,6 +14,9 @@ import FiltrosProductos from '../components/FiltrosProductos';
 
 const IMAGEN_FALLBACK = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' fill='%23edf4ef'/%3E%3Cpath d='M20 66l16-18 12 12 9-9 19 15' stroke='%2300693c' stroke-width='4' fill='none'/%3E%3Ccircle cx='33' cy='31' r='6' fill='%2387cb53'/%3E%3C/svg%3E";
 
+/**
+ * Muestra el listado paginado de productos con filtros y acciones de gestión.
+ */
 export default function ProductosPage() {
   const navigate = useNavigate();
   const {

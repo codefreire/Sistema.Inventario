@@ -6,6 +6,9 @@ interface FiltrosProductosProps {
   onCambiarFiltros: (filtros: FiltrosProducto) => void;
 }
 
+/**
+ * Renderiza el panel de filtros avanzados para la búsqueda de productos.
+ */
 export default function FiltrosProductos({ filtros, onCambiarFiltros }: FiltrosProductosProps) {
   const handleCambio = (campo: keyof FiltrosProducto, valor: string) => {
     const nuevosFiltros = { ...filtros };

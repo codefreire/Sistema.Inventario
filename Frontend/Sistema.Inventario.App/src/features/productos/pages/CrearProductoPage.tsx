@@ -7,6 +7,9 @@ import type { CrearProductoRequest } from '../types/Producto';
 import Button from '../../../shared/components/Button';
 import Notificacion from '../../../shared/components/Notificacion';
 
+/**
+ * Renderiza el formulario para registrar un nuevo producto en el inventario.
+ */
 export default function CrearProductoPage() {
   const navigate = useNavigate();
   const [modoImagen, setModoImagen] = useState<'url' | 'archivo'>('url');

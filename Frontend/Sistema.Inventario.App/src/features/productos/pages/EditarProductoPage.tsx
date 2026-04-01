@@ -7,6 +7,9 @@ import type { ActualizarProductoRequest } from '../types/Producto';
 import Button from '../../../shared/components/Button';
 import Notificacion from '../../../shared/components/Notificacion';
 
+/**
+ * Renderiza el formulario para editar la información de un producto existente.
+ */
 export default function EditarProductoPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();

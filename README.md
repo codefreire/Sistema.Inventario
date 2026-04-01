@@ -34,13 +34,17 @@ Aplicación web para la gestión de inventarios construida con arquitectura de m
 
 El frontend consume el gateway vía `VITE_API_BASE_URL`.
 
-Archivo de referencia: `Frontend/Sistema.Inventario.App/.env.example`
+**Pasos de configuración:**
 
-Ejemplo en `Frontend/Sistema.Inventario.App/.env`:
+1. Copiar el archivo `Frontend/Sistema.Inventario.App/.env.example`
+2. Renombrarlo a `.env` en el mismo directorio
+3. Descomentar y configurar la URL del API Gateway:
 
 ```env
 VITE_API_BASE_URL=http://localhost:7000/api
 ```
+
+**Nota:** El archivo `.env` será ignorado por Git (ver `.gitignore`). El `.env.example` se usa como referencia para otros desarrolladores.
 
 ### Dependencias clave (no base de plantilla)
 
@@ -223,6 +227,8 @@ Rutas principales a través del gateway:
 ---
 
 ## Ejecución del Frontend
+
+**Requisito previo:** Asegurar que el archivo `.env` esté configurado (ver sección de "Variables de entorno Frontend").
 
 ```bash
 cd Frontend/Sistema.Inventario.App

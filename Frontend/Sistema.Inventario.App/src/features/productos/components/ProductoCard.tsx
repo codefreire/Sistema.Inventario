@@ -5,6 +5,9 @@ interface ProductoCardProps {
   producto: Producto;
 }
 
+/**
+ * Muestra un resumen visual de un producto con sus datos principales.
+ */
 export default function ProductoCard({ producto }: ProductoCardProps) {
   return (
     <div className="producto-card">
