@@ -1,5 +1,5 @@
 import apiClient from '../../../shared/services/apiClient';
-import type { Producto, CrearProductoRequest, ActualizarProductoRequest } from '../types/Producto';
+import type { Producto, CrearProductoRequest, ActualizarProductoRequest, SubirImagenResponse } from '../types/Producto';
 
 const RUTA = '/productos';
 
@@ -43,6 +43,26 @@ export const productoService = {
   async crear(producto: CrearProductoRequest): Promise<Producto> {
     const respuesta = await apiClient.post<Producto>(RUTA, producto);
     return respuesta.data;
+  },
+
+  /**
+   * Sube una imagen de producto al endpoint multipart del backend.
+   *
+   * @param {File} archivo Archivo a subir (jpg, jpeg, png o webp).
+   * @returns {Promise<string>} URL pública final de la imagen almacenada.
+   * @throws {Error} Lanza un error cuando la subida falla o el backend rechaza el archivo.
+   */
+  async subirImagen(archivo: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('archivo', archivo);
+
+    const respuesta = await apiClient.post<SubirImagenResponse>(`${RUTA}/imagenes`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return respuesta.data.imagenUrl;
   },
 
   /**

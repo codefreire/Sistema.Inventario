@@ -26,6 +26,10 @@ export interface ActualizarProductoRequest {
   stock: number;
 }
 
+export interface SubirImagenResponse {
+  imagenUrl: string;
+}
+
 export interface FiltrosProducto {
   nombre?: string;
   categoria?: string;

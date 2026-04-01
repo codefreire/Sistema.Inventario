@@ -12,6 +12,8 @@ import Notificacion from '../../../shared/components/Notificacion';
 import ModalConfirmacion from '../../../shared/components/ModalConfirmacion';
 import FiltrosProductos from '../components/FiltrosProductos';
 
+const IMAGEN_FALLBACK = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' fill='%23edf4ef'/%3E%3Cpath d='M20 66l16-18 12 12 9-9 19 15' stroke='%2300693c' stroke-width='4' fill='none'/%3E%3Ccircle cx='33' cy='31' r='6' fill='%2387cb53'/%3E%3C/svg%3E";
+
 export default function ProductosPage() {
   const navigate = useNavigate();
   const {
@@ -53,6 +55,20 @@ export default function ProductosPage() {
   };
 
   const columnas: ColumnaTabla<Producto>[] = [
+    {
+      encabezado: 'Imagen',
+      accesor: (p) => (
+        <img
+          className="tabla-imagen-producto"
+          src={p.imagenUrl || IMAGEN_FALLBACK}
+          alt={`Imagen de ${p.nombre}`}
+          loading="lazy"
+          onError={(e) => {
+            e.currentTarget.src = IMAGEN_FALLBACK;
+          }}
+        />
+      ),
+    },
     { encabezado: 'Nombre', accesor: 'nombre' },
     { encabezado: 'Categoría', accesor: 'categoria' },
     { encabezado: 'Precio', accesor: (p) => formatearMoneda(p.precio) },

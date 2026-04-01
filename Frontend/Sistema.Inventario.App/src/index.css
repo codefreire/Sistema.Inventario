@@ -316,6 +316,16 @@ a {
   justify-content: center;
 }
 
+.tabla-imagen-producto {
+  width: 58px;
+  height: 58px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--borde);
+  box-shadow: var(--sombra-sm);
+  background: #f6fbf7;
+}
+
 .tabla-mensaje {
   text-align: center;
   padding: 3rem 1rem;
@@ -445,6 +455,29 @@ a {
   color: var(--info);
   font-size: 0.84rem;
   font-weight: 700;
+}
+
+.selector-imagen {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.preview-imagen-contenedor {
+  margin-top: 0.35rem;
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;
+  border: 1px solid var(--borde);
+  background: #f6fbf7;
+  box-shadow: var(--sombra-sm);
+  overflow: hidden;
+}
+
+.preview-imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .formulario-acciones {

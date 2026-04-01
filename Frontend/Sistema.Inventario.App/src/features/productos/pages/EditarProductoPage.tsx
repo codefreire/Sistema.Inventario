@@ -10,6 +10,10 @@ import Notificacion from '../../../shared/components/Notificacion';
 export default function EditarProductoPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const [modoImagen, setModoImagen] = useState<'url' | 'archivo'>('url');
+  const [archivoSeleccionado, setArchivoSeleccionado] = useState<File | null>(null);
+  const [previewArchivo, setPreviewArchivo] = useState<string>('');
+  const [subiendoImagen, setSubiendoImagen] = useState(false);
   const [formulario, setFormulario] = useState<ActualizarProductoRequest>({
     nombre: '',
     descripcion: '',
@@ -49,22 +53,56 @@ export default function EditarProductoPage() {
     setErrores((prev) => ({ ...prev, [campo]: undefined }));
   };
 
+  /**
+   * Maneja el archivo de imagen seleccionado y genera preview local.
+   */
+  const handleArchivoImagen = (archivo: File | null) => {
+    if (!archivo) {
+      setArchivoSeleccionado(null);
+      setPreviewArchivo('');
+      return;
+    }
+
+    setArchivoSeleccionado(archivo);
+    setPreviewArchivo(URL.createObjectURL(archivo));
+    setErrores((prev) => ({ ...prev, imagenUrl: undefined }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const erroresValidacion = validarProducto(formulario);
-    setErrores(erroresValidacion);
-
-    if (tieneErrores(erroresValidacion)) return;
 
     try {
       setEnviando(true);
-      await productoService.actualizar(id!, formulario);
+      let imagenUrlFinal = formulario.imagenUrl;
+
+      if (modoImagen === 'archivo') {
+        if (!archivoSeleccionado) {
+          setErrores((prev) => ({ ...prev, imagenUrl: 'Debe seleccionar un archivo de imagen.' }));
+          return;
+        }
+
+        setSubiendoImagen(true);
+        imagenUrlFinal = await productoService.subirImagen(archivoSeleccionado);
+      }
+
+      const payload: ActualizarProductoRequest = {
+        ...formulario,
+        imagenUrl: imagenUrlFinal,
+      };
+
+      const erroresValidacion = validarProducto(payload);
+      setErrores(erroresValidacion);
+
+      if (tieneErrores(erroresValidacion)) return;
+
+      await productoService.actualizar(id!, payload);
       setNotificacion({ mensaje: 'Producto actualizado correctamente.', tipo: 'exito', visible: true });
       setTimeout(() => navigate('/productos'), 1500);
     } catch (error) {
       const mensaje = error instanceof Error ? error.message : 'Error al actualizar el producto.';
       setNotificacion({ mensaje, tipo: 'error', visible: true });
     } finally {
+      setSubiendoImagen(false);
       setEnviando(false);
     }
   };
@@ -104,9 +142,64 @@ export default function EditarProductoPage() {
         </div>
 
         <div className="campo">
-          <label htmlFor="imagenUrl">URL de Imagen *</label>
-          <input id="imagenUrl" type="url" maxLength={500} value={formulario.imagenUrl} onChange={(e) => handleCambio('imagenUrl', e.target.value)} />
+          <label>Origen de Imagen *</label>
+          <div className="selector-imagen">
+            <Button
+              type="button"
+              variante={modoImagen === 'url' ? 'primario' : 'secundario'}
+              onClick={() => {
+                setModoImagen('url');
+                setArchivoSeleccionado(null);
+                setPreviewArchivo('');
+                setErrores((prev) => ({ ...prev, imagenUrl: undefined }));
+              }}
+            >
+              Usar URL
+            </Button>
+            <Button
+              type="button"
+              variante={modoImagen === 'archivo' ? 'primario' : 'secundario'}
+              onClick={() => {
+                setModoImagen('archivo');
+                setErrores((prev) => ({ ...prev, imagenUrl: undefined }));
+              }}
+            >
+              Subir Archivo
+            </Button>
+          </div>
+
+          {modoImagen === 'url' ? (
+            <input
+              id="imagenUrl"
+              type="url"
+              maxLength={500}
+              placeholder="https://dominio.com/imagen.jpg"
+              value={formulario.imagenUrl}
+              onChange={(e) => handleCambio('imagenUrl', e.target.value)}
+            />
+          ) : (
+            <input
+              id="archivoImagen"
+              type="file"
+              accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+              onChange={(e) => handleArchivoImagen(e.target.files?.[0] ?? null)}
+            />
+          )}
+
+          {previewArchivo && modoImagen === 'archivo' && (
+            <div className="preview-imagen-contenedor">
+              <img className="preview-imagen" src={previewArchivo} alt="Vista previa del archivo de producto" />
+            </div>
+          )}
+
+          {modoImagen === 'url' && formulario.imagenUrl && (
+            <div className="preview-imagen-contenedor">
+              <img className="preview-imagen" src={formulario.imagenUrl} alt="Vista previa de la URL actual" />
+            </div>
+          )}
+
           {errores.imagenUrl && <span className="campo-error">{errores.imagenUrl}</span>}
+          {modoImagen === 'archivo' && <span className="campo-info">Al guardar se subirá el archivo y se reemplazará imagenUrl automáticamente.</span>}
         </div>
 
         <div className="formulario-fila">
@@ -125,7 +218,7 @@ export default function EditarProductoPage() {
 
         <div className="formulario-acciones">
           <Button variante="secundario" type="button" onClick={() => navigate('/productos')}>Cancelar</Button>
-          <Button type="submit" disabled={enviando}>{enviando ? 'Guardando...' : 'Actualizar Producto'}</Button>
+          <Button type="submit" disabled={enviando || subiendoImagen}>{enviando || subiendoImagen ? 'Guardando...' : 'Actualizar Producto'}</Button>
         </div>
       </form>
     </div>
