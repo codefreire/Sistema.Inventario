@@ -1,9 +1,11 @@
 using Microsoft.Extensions.Logging;
 using Moq;
+using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Externos;
 using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Requests;
 using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Responses;
 using Sistema.Inventario.Transaccion.Aplicacion.Servicios;
 using Sistema.Inventario.Transaccion.Dominio.Entidades;
+using Sistema.Inventario.Transaccion.Infraestructura.ClientesExternos;
 using Sistema.Inventario.Transaccion.Infraestructura.Repositorios;
 
 namespace Sistema.Inventario.Transaccion.Tests.PruebasUnitarias;
@@ -19,6 +21,11 @@ public class TransaccionServicioTests
     private readonly Mock<ITransaccionRepositorio> _repositorioTransaccionMock = new();
 
     /// <summary>
+    /// Mock para el cliente API de productos (comunicación entre microservicios)
+    /// </summary>
+    private readonly Mock<IProductoApiCliente> _productoApiClienteMock = new();
+
+    /// <summary>
     /// Mock para el servicio de logging
     /// </summary>
     private readonly Mock<ILogger<TransaccionServicio>> _loggerMock = new();
@@ -29,7 +36,7 @@ public class TransaccionServicioTests
     /// <returns></returns>
     private TransaccionServicio CrearServicio()
     {
-        return new TransaccionServicio(_repositorioTransaccionMock.Object, _loggerMock.Object);
+        return new TransaccionServicio(_repositorioTransaccionMock.Object, _productoApiClienteMock.Object, _loggerMock.Object);
     }
 
     /// <summary>
@@ -120,14 +127,25 @@ public class TransaccionServicioTests
     public async Task CrearTransaccionAsync_CuandoLaSolicitudEsValida_RetornaTransaccion()
     {
         // ARRANGE: Preparar solicitud de creación y capturar entidad enviada al repositorio
+        Guid productoId = Guid.NewGuid();
+
         CrearTransaccionRequest request = new()
         {
             TipoTransaccion = "Compra",
-            ProductoId = Guid.NewGuid(),
+            ProductoId = productoId,
             Cantidad = 6,
             PrecioUnitario = 9.5m,
             Detalle = "Compra semanal"
         };
+
+        // Mock del cliente API de productos: el producto existe con stock suficiente
+        _productoApiClienteMock
+            .Setup(cliente => cliente.ObtenerProductoPorIdAsync(productoId))
+            .ReturnsAsync(new ProductoExternoResponse { Id = productoId, Nombre = "Producto Test", Stock = 100, Precio = 9.5m });
+
+        _productoApiClienteMock
+            .Setup(cliente => cliente.AjustarStockAsync(productoId, 6, "Compra"))
+            .ReturnsAsync(true);
 
         TransaccionEntidad? transaccionCreada = null;
 
@@ -155,6 +173,7 @@ public class TransaccionServicioTests
         Assert.Equal(57m, resultado.PrecioTotal);
 
         _repositorioTransaccionMock.Verify(repositorio => repositorio.CrearTransaccionAsync(It.IsAny<TransaccionEntidad>()), Times.Once);
+        _productoApiClienteMock.Verify(cliente => cliente.AjustarStockAsync(productoId, 6, "Compra"), Times.Once);
     }
 
     /// <summary>
@@ -165,16 +184,41 @@ public class TransaccionServicioTests
     {
         // ARRANGE: Preparar identificador, solicitud de actualización y comportamiento del repositorio
         Guid idTransaccion = Guid.NewGuid();
+        Guid productoId = Guid.NewGuid();
         DateTime fechaExistente = new DateTime(2026, 2, 10, 9, 45, 0);
 
         ActualizarTransaccionRequest request = new()
         {
             TipoTransaccion = "Venta",
-            ProductoId = Guid.NewGuid(),
+            ProductoId = productoId,
             Cantidad = 3,
             PrecioUnitario = 18m,
             Detalle = "Venta actualizada"
         };
+
+        // Mock: la transacción actual existe (para revertir stock)
+        _repositorioTransaccionMock
+            .Setup(repositorio => repositorio.ObtenerTransaccionPorIdAsync(idTransaccion))
+            .ReturnsAsync(new TransaccionEntidad
+            {
+                Id = idTransaccion,
+                Fecha = fechaExistente,
+                TipoTransaccion = "Compra",
+                ProductoId = productoId,
+                Cantidad = 5,
+                PrecioUnitario = 15m,
+                PrecioTotal = 75m,
+                Detalle = "Compra original"
+            });
+
+        // Mock del cliente API de productos
+        _productoApiClienteMock
+            .Setup(cliente => cliente.ObtenerProductoPorIdAsync(productoId))
+            .ReturnsAsync(new ProductoExternoResponse { Id = productoId, Nombre = "Producto Test", Stock = 50, Precio = 18m });
+
+        _productoApiClienteMock
+            .Setup(cliente => cliente.AjustarStockAsync(productoId, It.IsAny<int>(), It.IsAny<string>()))
+            .ReturnsAsync(true);
 
         _repositorioTransaccionMock
             .Setup(repositorio => repositorio.ActualizarTransaccionAsync(idTransaccion, It.IsAny<TransaccionEntidad>()))
@@ -217,8 +261,8 @@ public class TransaccionServicioTests
         Guid idTransaccion = Guid.NewGuid();
 
         _repositorioTransaccionMock
-            .Setup(repositorio => repositorio.EliminarTransaccionAsync(idTransaccion))
-            .ReturnsAsync(false);
+            .Setup(repositorio => repositorio.ObtenerTransaccionPorIdAsync(idTransaccion))
+            .ReturnsAsync((TransaccionEntidad?)null);
 
         TransaccionServicio servicio = CrearServicio();
 

@@ -6,9 +6,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
+using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Externos;
 using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Requests;
 using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Responses;
 using Sistema.Inventario.Transaccion.Dominio.Entidades;
+using Sistema.Inventario.Transaccion.Infraestructura.ClientesExternos;
 using Sistema.Inventario.Transaccion.Infraestructura.Persistencia;
 
 namespace Sistema.Inventario.Transaccion.Tests.PruebasIntegracion;
@@ -40,6 +43,17 @@ public class TransaccionesControllerIntegracionTests : IClassFixture<WebApplicat
 
                 servicios.AddDbContext<TransaccionDbContext>(opciones =>
                     opciones.UseInMemoryDatabase("InventarioTransaccionesTestBD"));
+
+                // Mock del cliente API de Productos para pruebas de integración
+                servicios.RemoveAll<IProductoApiCliente>();
+                Mock<IProductoApiCliente> productoApiClienteMock = new();
+                productoApiClienteMock
+                    .Setup(cliente => cliente.ObtenerProductoPorIdAsync(It.IsAny<Guid>()))
+                    .ReturnsAsync((Guid id) => new ProductoExternoResponse { Id = id, Nombre = "Producto Test", Stock = 1000, Precio = 10m });
+                productoApiClienteMock
+                    .Setup(cliente => cliente.AjustarStockAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
+                    .ReturnsAsync(true);
+                servicios.AddScoped<IProductoApiCliente>(_ => productoApiClienteMock.Object);
             });
         });
     }
