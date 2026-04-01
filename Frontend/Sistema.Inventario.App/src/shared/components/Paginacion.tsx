@@ -4,6 +4,28 @@ interface PaginacionProps {
   onCambiarPagina: (pagina: number) => void;
 }
 
+/**
+ * Componente de paginacion reutilizable para listados tabulares.
+ *
+ * Comportamiento:
+ * - Si `totalPaginas` es menor o igual a 1, no renderiza controles.
+ * - Muestra un rango centrado en la pagina actual (radio de 2 paginas por lado).
+ * - Incluye botones para primera/ultima pagina cuando quedan fuera del rango visible.
+ * - Deshabilita navegacion anterior/siguiente en los extremos.
+ *
+ * @param {PaginacionProps} props Propiedades de paginacion.
+ * @param {number} props.paginaActual Pagina seleccionada actualmente (base 1).
+ * @param {number} props.totalPaginas Total de paginas disponibles.
+ * @param {(pagina: number) => void} props.onCambiarPagina Callback ejecutado al seleccionar una nueva pagina.
+ * @returns {JSX.Element | null} Controles de paginacion o `null` cuando no aplica paginar.
+ *
+ * @example
+ * <Paginacion
+ *   paginaActual={paginaActual}
+ *   totalPaginas={totalPaginas}
+ *   onCambiarPagina={setPaginaActual}
+ * />
+ */
 export default function Paginacion({ paginaActual, totalPaginas, onCambiarPagina }: PaginacionProps) {
   if (totalPaginas <= 1) return null;
 

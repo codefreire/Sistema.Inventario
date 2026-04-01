@@ -1,5 +1,8 @@
 import { NavLink } from 'react-router-dom';
 
+/**
+ * Renderiza la barra de navegación principal con accesos a productos y transacciones.
+ */
 export default function Navbar() {
   return (
     <nav className="navbar">

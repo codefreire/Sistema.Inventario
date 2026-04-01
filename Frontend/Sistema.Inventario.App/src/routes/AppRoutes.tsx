@@ -7,6 +7,9 @@ import TransaccionesPage from '../features/transacciones/pages/TransaccionesPage
 import CrearTransaccionPage from '../features/transacciones/pages/CrearTransaccionPage';
 import EditarTransaccionPage from '../features/transacciones/pages/EditarTransaccionPage';
 
+/**
+ * Define las rutas principales de la aplicación y redirige la raíz a productos.
+ */
 export default function AppRoutes() {
   return (
     <Routes>
