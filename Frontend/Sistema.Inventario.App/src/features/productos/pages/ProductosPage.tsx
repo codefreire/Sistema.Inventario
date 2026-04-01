@@ -109,7 +109,10 @@ export default function ProductosPage() {
         mensajeVacio="No se encontraron productos."
         acciones={(producto) => (
           <>
-            <Button variante="secundario" onClick={() => navigate(`/productos/editar/${producto.id}`)}>
+            <Button variante="secundario" onClick={() => navigate(`/productos/consulta/${producto.id}`)}>
+              👁️ Ver
+            </Button>
+            <Button variante="exito" onClick={() => navigate(`/productos/editar/${producto.id}`)}>
               ✏️ Editar
             </Button>
             <Button variante="peligro" onClick={() => setModalEliminar({ visible: true, producto })}>
