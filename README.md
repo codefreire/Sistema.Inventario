@@ -140,6 +140,11 @@ Notas de arquitectura:
     - Backend con comentarios XML (`///`) en clases, métodos y contratos.
     - Frontend con comentarios JSDoc/TypeScript en servicios, utilidades y componentes clave.
 9. Documentación de APIs con Swagger en Productos, Transacciones y Gateway.
+10. Validaciones y manejo de excepciones:
+    - Backend: FluentValidation en capa Aplicación, validación de tipos/propiedades y reglas de negocio.
+    - Backend: Middleware de captura de excepciones globales registrando con Serilog.
+    - Frontend: Validación de formularios con feedback al usuario vía componentes de notificación.
+    - Frontend: Manejo de errores HTTP y timouts con mensajes claros en interfaz.
 
 ---
 

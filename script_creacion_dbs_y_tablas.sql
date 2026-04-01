@@ -1,15 +1,15 @@
---Crear base de datos
+--Crear base de datos para el microservicio de Productos (si existe no lo crea)
 IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'InventarioProductosBD')
 BEGIN
 	CREATE DATABASE InventarioProductosBD;
 END
 GO
 
---Ir a la base de datos
+--Ir a la base de datos InventarioProductosBD
 USE InventarioProductosBD
 GO
 
---Crear tabla Productos
+--Crear tabla Productos (si existe no lo crea)
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Productos')
 BEGIN
 	CREATE TABLE Productos(
@@ -24,6 +24,7 @@ BEGIN
 END
 GO
 
+--Crear índice en la columna Nombre de la tabla Productos (si existe no lo crea)
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Productos_Nombre' AND object_id = OBJECT_ID('dbo.Productos'))
 BEGIN
 	CREATE INDEX IX_Productos_Nombre
@@ -31,18 +32,18 @@ BEGIN
 END
 GO
 
---Crear base de datos
+--Crear base de datos para el microservicio de Transacciones (si existe no lo crea)
 IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'InventarioTransaccionesBD')
 BEGIN
 	CREATE DATABASE InventarioTransaccionesBD;
 END
 GO
 
---Ir a la base de datos
+--Ir a la base de datos InventarioTransaccionesBD
 USE InventarioTransaccionesBD
 GO
 
---Crear tabla Transacciones
+--Crear tabla Transacciones (si existe no lo crea)
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Transacciones')
 BEGIN
 	CREATE TABLE Transacciones(
@@ -58,6 +59,7 @@ BEGIN
 END
 GO
 
+--Crear índice en la columna ProductoId de la tabla Transacciones (si existe no lo crea)
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Transacciones_ProductoId' AND object_id = OBJECT_ID('dbo.Transacciones'))
 BEGIN
 	CREATE INDEX IX_Transacciones_ProductoId
@@ -65,6 +67,7 @@ BEGIN
 END
 GO
 
+--Crear índice en la columna Fecha de la tabla Transacciones (si existe no lo crea)
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Transacciones_Fecha' AND object_id = OBJECT_ID('dbo.Transacciones'))
 BEGIN
 	CREATE INDEX IX_Transacciones_Fecha
