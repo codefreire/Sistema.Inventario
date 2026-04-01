@@ -55,11 +55,13 @@ public static class ExtensionesServicios
         servicios.AddScoped<CrearProductoHandler>();
         servicios.AddScoped<ActualizarProductoHandler>();
         servicios.AddScoped<EliminarProductoHandler>();
+        servicios.AddScoped<AjustarStockHandler>();
 
         servicios.AddFluentValidationAutoValidation();
         servicios.AddValidatorsFromAssemblyContaining<ObtenerProductoPorIdValidator>();
         servicios.AddValidatorsFromAssemblyContaining<CrearProductoValidator>();
         servicios.AddValidatorsFromAssemblyContaining<ActualizarProductoValidator>();
+        servicios.AddValidatorsFromAssemblyContaining<AjustarStockValidator>();
         return servicios;
     }
 }

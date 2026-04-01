@@ -206,4 +206,68 @@ public class ProductoServicio : IProductoServicio
             throw;
         }
     }
+
+    /// <summary>
+    /// Método para ajustar el stock de un Producto
+    /// </summary>
+    /// <param name="id">Identificador del Producto</param>
+    /// <param name="cantidad">Cantidad a ajustar</param>
+    /// <param name="tipoOperacion">Tipo de operación: Compra (incrementar) o Venta (decrementar)</param>
+    /// <returns>Producto con stock ajustado o null si no existe</returns>
+    public async Task<ProductoResponse?> AjustarStockAsync(Guid id, int cantidad, string tipoOperacion)
+    {
+        try
+        {
+            ProductoEntidad? producto = await _productoRepositorio.ObtenerProductoPorIdAsync(id);
+            if (producto is null)
+            {
+                _logger.LogWarning($"No se encontró el producto con Id {id} para ajustar stock.");
+                return null;
+            }
+
+            int nuevoStock = tipoOperacion.Equals("Compra", StringComparison.OrdinalIgnoreCase)
+                ? producto.Stock + cantidad
+                : producto.Stock - cantidad;
+
+            if (nuevoStock < 0)
+            {
+                _logger.LogWarning($"Stock insuficiente para el producto con Id {id}. Stock actual: {producto.Stock}, cantidad solicitada: {cantidad}.");
+                return null;
+            }
+
+            ProductoEntidad datosActualizados = new()
+            {
+                Nombre = producto.Nombre,
+                Descripcion = producto.Descripcion,
+                Categoria = producto.Categoria,
+                ImagenUrl = producto.ImagenUrl,
+                Precio = producto.Precio,
+                Stock = nuevoStock
+            };
+
+            ProductoEntidad? productoActualizado = await _productoRepositorio.ActualizarProductoAsync(id, datosActualizados);
+            if (productoActualizado is null)
+            {
+                return null;
+            }
+
+            _logger.LogInformation($"Stock ajustado para producto con Id {id}. Tipo: {tipoOperacion}, Cantidad: {cantidad}, Nuevo stock: {nuevoStock}.");
+
+            return new ProductoResponse
+            {
+                Id = productoActualizado.Id,
+                Nombre = productoActualizado.Nombre,
+                Descripcion = productoActualizado.Descripcion,
+                Categoria = productoActualizado.Categoria,
+                ImagenUrl = productoActualizado.ImagenUrl,
+                Precio = productoActualizado.Precio,
+                Stock = productoActualizado.Stock
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error inesperado al ajustar el stock del producto con Id {id}.");
+            throw;
+        }
+    }
 }

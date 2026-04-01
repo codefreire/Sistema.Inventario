@@ -42,4 +42,13 @@ public interface IProductoServicio
     /// <param name="id">Identificador del Producto</param>
     /// <returns>True si fue eliminado, false si no existe</returns>
     Task<bool> EliminarProductoAsync(Guid id);
+
+    /// <summary>
+    /// Método para ajustar el stock de un Producto
+    /// </summary>
+    /// <param name="id">Identificador del Producto</param>
+    /// <param name="cantidad">Cantidad a ajustar</param>
+    /// <param name="tipoOperacion">Tipo de operación: Compra (incrementar) o Venta (decrementar)</param>
+    /// <returns>Producto con stock ajustado o null si no existe</returns>
+    Task<ProductoResponse?> AjustarStockAsync(Guid id, int cantidad, string tipoOperacion);
 }

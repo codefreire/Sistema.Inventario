@@ -38,6 +38,11 @@ public class ProductosController : ControllerBase
     private readonly EliminarProductoHandler _eliminarProductoHandler;
 
     /// <summary>
+    /// Handler para ajustar el stock de un Producto
+    /// </summary>
+    private readonly AjustarStockHandler _ajustarStockHandler;
+
+    /// <summary>
     /// Constructor del controlador de Productos
     /// </summary>
     /// <param name="obtenerProductosHandler">Handler para obtener la lista de Productos</param>
@@ -45,13 +50,15 @@ public class ProductosController : ControllerBase
     /// <param name="crearProductoHandler">Handler para crear un Producto</param>
     /// <param name="actualizarProductoHandler">Handler para actualizar un Producto</param>
     /// <param name="eliminarProductoHandler">Handler para eliminar un Producto</param>
-    public ProductosController(ObtenerProductosHandler obtenerProductosHandler, ObtenerProductoHandler obtenerProductoHandler, CrearProductoHandler crearProductoHandler, ActualizarProductoHandler actualizarProductoHandler, EliminarProductoHandler eliminarProductoHandler)
+    /// <param name="ajustarStockHandler">Handler para ajustar el stock de un Producto</param>
+    public ProductosController(ObtenerProductosHandler obtenerProductosHandler, ObtenerProductoHandler obtenerProductoHandler, CrearProductoHandler crearProductoHandler, ActualizarProductoHandler actualizarProductoHandler, EliminarProductoHandler eliminarProductoHandler, AjustarStockHandler ajustarStockHandler)
     {
         _obtenerProductosHandler = obtenerProductosHandler;
         _obtenerProductoHandler = obtenerProductoHandler;
         _crearProductoHandler = crearProductoHandler;
         _actualizarProductoHandler = actualizarProductoHandler;
         _eliminarProductoHandler = eliminarProductoHandler;
+        _ajustarStockHandler = ajustarStockHandler;
     }
 
     /// <summary>
@@ -124,5 +131,22 @@ public class ProductosController : ControllerBase
             return NotFound($"No se encontró el producto con Id {request.Id}.");
         }
         return NoContent();
+    }
+
+    /// <summary>
+    /// Endpoint para ajustar el stock de un Producto
+    /// </summary>
+    /// <param name="idRequest">Dato para obtener el Id del Producto</param>
+    /// <param name="request">Datos del ajuste de stock</param>
+    /// <returns>Producto con stock ajustado</returns>
+    [HttpPatch("{id:guid}/stock")]
+    public async Task<ActionResult<ProductoResponse>> AjustarStock([FromRoute] ObtenerProductoPorIdRequest idRequest, [FromBody] AjustarStockRequest request)
+    {
+        ProductoResponse? producto = await _ajustarStockHandler.Handle(idRequest.Id, request);
+        if (producto is null)
+        {
+            return BadRequest($"No se pudo ajustar el stock del producto con Id {idRequest.Id}. Verifique que el producto exista y que haya stock suficiente.");
+        }
+        return Ok(producto);
     }
 }
