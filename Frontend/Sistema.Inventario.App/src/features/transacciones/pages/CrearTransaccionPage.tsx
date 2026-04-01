@@ -9,6 +9,9 @@ import type { Producto } from '../../productos/types/Producto';
 import Button from '../../../shared/components/Button';
 import Notificacion from '../../../shared/components/Notificacion';
 
+/**
+ * Renderiza el formulario para registrar una nueva transacción.
+ */
 export default function CrearTransaccionPage() {
   const navigate = useNavigate();
   const [productos, setProductos] = useState<Producto[]>([]);

@@ -5,6 +5,9 @@ interface TransaccionCardProps {
   transaccion: Transaccion;
 }
 
+/**
+ * Muestra una tarjeta resumen con la información principal de una transacción.
+ */
 export default function TransaccionCard({ transaccion }: TransaccionCardProps) {
   return (
     <div className="transaccion-card">

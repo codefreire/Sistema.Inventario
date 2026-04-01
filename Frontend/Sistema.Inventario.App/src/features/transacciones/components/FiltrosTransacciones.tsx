@@ -8,6 +8,9 @@ interface FiltrosTransaccionesProps {
   productos: Producto[];
 }
 
+/**
+ * Renderiza el panel de filtros avanzados para consultar transacciones.
+ */
 export default function FiltrosTransacciones({ filtros, onCambiarFiltros, productos }: FiltrosTransaccionesProps) {
   const handleCambio = (campo: keyof FiltrosTransaccion, valor: string) => {
     const nuevosFiltros = { ...filtros };

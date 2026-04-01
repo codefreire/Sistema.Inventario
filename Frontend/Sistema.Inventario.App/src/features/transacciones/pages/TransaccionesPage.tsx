@@ -14,6 +14,9 @@ import Notificacion from '../../../shared/components/Notificacion';
 import ModalConfirmacion from '../../../shared/components/ModalConfirmacion';
 import FiltrosTransacciones from '../components/FiltrosTransacciones';
 
+/**
+ * Muestra el listado paginado de transacciones con filtros y acciones de gestión.
+ */
 export default function TransaccionesPage() {
   const navigate = useNavigate();
   const {
@@ -38,7 +41,7 @@ export default function TransaccionesPage() {
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
   useEffect(() => {
-    productoService.obtenerTodos().then(setProductos).catch(() => {});
+    productoService.obtenerTodos().then(setProductos).catch(() => { });
   }, []);
 
   const obtenerNombreProducto = (productoId: string) => {
@@ -66,11 +69,13 @@ export default function TransaccionesPage() {
 
   const columnas: ColumnaTabla<Transaccion>[] = [
     { encabezado: 'Fecha', accesor: (t) => new Date(t.fecha).toLocaleDateString('es-EC') },
-    { encabezado: 'Tipo', accesor: (t) => (
-      <span className={`badge badge-${t.tipoTransaccion.toLowerCase() === 'compra' ? 'exito' : 'peligro'}`}>
-        {t.tipoTransaccion}
-      </span>
-    )},
+    {
+      encabezado: 'Tipo', accesor: (t) => (
+        <span className={`badge badge-${t.tipoTransaccion.toLowerCase() === 'compra' ? 'exito' : 'peligro'}`}>
+          {t.tipoTransaccion}
+        </span>
+      )
+    },
     { encabezado: 'Producto', accesor: (t) => obtenerNombreProducto(t.productoId) },
     { encabezado: 'Cantidad', accesor: 'cantidad' },
     { encabezado: 'P. Unitario', accesor: (t) => formatearMoneda(t.precioUnitario) },
