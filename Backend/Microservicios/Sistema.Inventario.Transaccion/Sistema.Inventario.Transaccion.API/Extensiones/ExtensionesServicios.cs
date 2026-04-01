@@ -6,6 +6,7 @@ using Microsoft.OpenApi;
 using Sistema.Inventario.Transaccion.Aplicacion.Handlers;
 using Sistema.Inventario.Transaccion.Aplicacion.Servicios;
 using Sistema.Inventario.Transaccion.Aplicacion.Validators;
+using Sistema.Inventario.Transaccion.Infraestructura.ClientesExternos;
 using Sistema.Inventario.Transaccion.Infraestructura.Persistencia;
 using Sistema.Inventario.Transaccion.Infraestructura.Repositorios;
 
@@ -50,6 +51,15 @@ public static class ExtensionesServicios
 
         servicios.AddScoped<ITransaccionRepositorio, TransaccionRepositorio>();
         servicios.AddScoped<ITransaccionServicio, TransaccionServicio>();
+
+        // Comunicación síncrona con el microservicio de Productos via HttpClient
+        servicios.AddHttpClient<IProductoApiCliente, ProductoApiCliente>(cliente =>
+        {
+            string productoApiUrl = configuracion["MicroserviciosUrls:ProductoApi"]
+                ?? "http://localhost:5261";
+            cliente.BaseAddress = new Uri(productoApiUrl);
+        });
+
         servicios.AddScoped<ObtenerTransaccionesHandler>();
         servicios.AddScoped<ObtenerTransaccionHandler>();
         servicios.AddScoped<CrearTransaccionHandler>();
