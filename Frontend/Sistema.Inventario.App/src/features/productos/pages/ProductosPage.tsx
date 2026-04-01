@@ -44,8 +44,9 @@ export default function ProductosPage() {
       await productoService.eliminar(modalEliminar.producto.id);
       mostrarNotificacion('Producto eliminado correctamente.', 'exito');
       recargar();
-    } catch {
-      mostrarNotificacion('Error al eliminar el producto.', 'error');
+    } catch (error) {
+      const mensaje = error instanceof Error ? error.message : 'Error al eliminar el producto.';
+      mostrarNotificacion(mensaje, 'error');
     } finally {
       setModalEliminar({ visible: false, producto: null });
     }

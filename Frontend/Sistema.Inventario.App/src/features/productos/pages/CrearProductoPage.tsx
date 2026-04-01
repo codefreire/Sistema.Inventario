@@ -38,8 +38,9 @@ export default function CrearProductoPage() {
       await productoService.crear(formulario);
       setNotificacion({ mensaje: 'Producto creado correctamente.', tipo: 'exito', visible: true });
       setTimeout(() => navigate('/productos'), 1500);
-    } catch {
-      setNotificacion({ mensaje: 'Error al crear el producto.', tipo: 'error', visible: true });
+    } catch (error) {
+      const mensaje = error instanceof Error ? error.message : 'Error al crear el producto.';
+      setNotificacion({ mensaje, tipo: 'error', visible: true });
     } finally {
       setEnviando(false);
     }

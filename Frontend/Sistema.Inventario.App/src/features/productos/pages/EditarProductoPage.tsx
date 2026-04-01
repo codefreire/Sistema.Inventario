@@ -37,8 +37,9 @@ export default function EditarProductoPage() {
           stock: producto.stock,
         });
       })
-      .catch(() => {
-        setNotificacion({ mensaje: 'Error al cargar el producto.', tipo: 'error', visible: true });
+      .catch((error) => {
+        const mensaje = error instanceof Error ? error.message : 'Error al cargar el producto.';
+        setNotificacion({ mensaje, tipo: 'error', visible: true });
       })
       .finally(() => setCargando(false));
   }, [id]);
@@ -60,8 +61,9 @@ export default function EditarProductoPage() {
       await productoService.actualizar(id!, formulario);
       setNotificacion({ mensaje: 'Producto actualizado correctamente.', tipo: 'exito', visible: true });
       setTimeout(() => navigate('/productos'), 1500);
-    } catch {
-      setNotificacion({ mensaje: 'Error al actualizar el producto.', tipo: 'error', visible: true });
+    } catch (error) {
+      const mensaje = error instanceof Error ? error.message : 'Error al actualizar el producto.';
+      setNotificacion({ mensaje, tipo: 'error', visible: true });
     } finally {
       setEnviando(false);
     }
