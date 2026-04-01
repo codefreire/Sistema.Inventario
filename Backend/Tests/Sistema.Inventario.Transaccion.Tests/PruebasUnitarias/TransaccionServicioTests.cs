@@ -272,4 +272,122 @@ public class TransaccionServicioTests
         // ASSERT: Verificar que el servicio retorne falso
         Assert.False(resultado);
     }
+
+    /// <summary>
+    /// Valida que el servicio retorne la transacción correctamente mapeada cuando existe
+    /// </summary>
+    [Fact]
+    public async Task ObtenerTransaccionPorIdAsync_CuandoExiste_RetornaTransaccion()
+    {
+        // ARRANGE: Preparar entidad de transacción existente y configurar el mock del repositorio
+        Guid idTransaccion = Guid.NewGuid();
+        Guid productoId = Guid.NewGuid();
+
+        TransaccionEntidad transaccionEntidad = new()
+        {
+            Id = idTransaccion,
+            Fecha = new DateTime(2026, 2, 20, 11, 0, 0),
+            TipoTransaccion = "Venta",
+            ProductoId = productoId,
+            Cantidad = 3,
+            PrecioUnitario = 25m,
+            PrecioTotal = 75m,
+            Detalle = "Venta mostrador"
+        };
+
+        _repositorioTransaccionMock
+            .Setup(repositorio => repositorio.ObtenerTransaccionPorIdAsync(idTransaccion))
+            .ReturnsAsync(transaccionEntidad);
+
+        TransaccionServicio servicio = CrearServicio();
+
+        // ACT: Obtener la transacción existente por su identificador
+        TransaccionResponse? resultado = await servicio.ObtenerTransaccionPorIdAsync(idTransaccion);
+
+        // ASSERT: Verificar que los datos mapeados sean correctos
+        Assert.NotNull(resultado);
+        Assert.Equal(idTransaccion, resultado!.Id);
+        Assert.Equal("Venta", resultado.TipoTransaccion);
+        Assert.Equal(productoId, resultado.ProductoId);
+        Assert.Equal(3, resultado.Cantidad);
+        Assert.Equal(75m, resultado.PrecioTotal);
+        Assert.Equal("Venta mostrador", resultado.Detalle);
+    }
+
+    /// <summary>
+    /// Valida que el servicio retorne null cuando la transacción a actualizar no existe
+    /// </summary>
+    [Fact]
+    public async Task ActualizarTransaccionAsync_CuandoNoExiste_RetornaNull()
+    {
+        // ARRANGE: Preparar identificador inexistente y configurar el repositorio para retornar null
+        Guid idTransaccion = Guid.NewGuid();
+
+        _repositorioTransaccionMock
+            .Setup(repositorio => repositorio.ObtenerTransaccionPorIdAsync(idTransaccion))
+            .ReturnsAsync((TransaccionEntidad?)null);
+
+        ActualizarTransaccionRequest request = new()
+        {
+            TipoTransaccion = "Compra",
+            ProductoId = Guid.NewGuid(),
+            Cantidad = 2,
+            PrecioUnitario = 10m,
+            Detalle = "Actualización fallida"
+        };
+
+        TransaccionServicio servicio = CrearServicio();
+
+        // ACT: Intentar actualizar una transacción inexistente
+        TransaccionResponse? resultado = await servicio.ActualizarTransaccionAsync(idTransaccion, request);
+
+        // ASSERT: Verificar que el resultado sea nulo y el repositorio no intente actualizar
+        Assert.Null(resultado);
+        _repositorioTransaccionMock.Verify(repositorio => repositorio.ActualizarTransaccionAsync(It.IsAny<Guid>(), It.IsAny<TransaccionEntidad>()), Times.Never);
+    }
+
+    /// <summary>
+    /// Valida que el servicio retorne verdadero y revierta el stock cuando la transacción existe
+    /// </summary>
+    [Fact]
+    public async Task EliminarTransaccionAsync_CuandoExiste_RetornaVerdadero()
+    {
+        // ARRANGE: Preparar transacción existente de tipo Compra y configurar mocks
+        Guid idTransaccion = Guid.NewGuid();
+        Guid productoId = Guid.NewGuid();
+
+        TransaccionEntidad transaccionExistente = new()
+        {
+            Id = idTransaccion,
+            Fecha = new DateTime(2026, 3, 1, 10, 0, 0),
+            TipoTransaccion = "Compra",
+            ProductoId = productoId,
+            Cantidad = 5,
+            PrecioUnitario = 20m,
+            PrecioTotal = 100m,
+            Detalle = "Compra a eliminar"
+        };
+
+        _repositorioTransaccionMock
+            .Setup(repositorio => repositorio.ObtenerTransaccionPorIdAsync(idTransaccion))
+            .ReturnsAsync(transaccionExistente);
+
+        _repositorioTransaccionMock
+            .Setup(repositorio => repositorio.EliminarTransaccionAsync(idTransaccion))
+            .ReturnsAsync(true);
+
+        _productoApiClienteMock
+            .Setup(cliente => cliente.AjustarStockAsync(productoId, 5, "Venta"))
+            .ReturnsAsync(true);
+
+        TransaccionServicio servicio = CrearServicio();
+
+        // ACT: Eliminar la transacción existente
+        bool resultado = await servicio.EliminarTransaccionAsync(idTransaccion);
+
+        // ASSERT: Verificar eliminación exitosa y reversión del stock
+        Assert.True(resultado);
+        _repositorioTransaccionMock.Verify(repositorio => repositorio.EliminarTransaccionAsync(idTransaccion), Times.Once);
+        _productoApiClienteMock.Verify(cliente => cliente.AjustarStockAsync(productoId, 5, "Venta"), Times.Once);
+    }
 }

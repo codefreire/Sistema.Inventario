@@ -219,6 +219,105 @@ public class TransaccionesControllerIntegracionTests : IClassFixture<WebApplicat
     }
 
     /// <summary>
+    /// Valida que POST /api/transacciones retorne 400 BadRequest cuando el request es inválido
+    /// </summary>
+    [Fact]
+    public async Task CrearTransaccion_CuandoRequestEsInvalido_Retorna400()
+    {
+        // ARRANGE: Preparar solicitud con datos inválidos (campos vacíos)
+        await ReiniciarBaseAsync();
+        using HttpClient cliente = _factory.CreateClient();
+
+        CrearTransaccionRequest requestInvalido = new()
+        {
+            TipoTransaccion = "",
+            ProductoId = Guid.Empty,
+            Cantidad = 0,
+            PrecioUnitario = -5m,
+            Detalle = ""
+        };
+
+        // ACT: Ejecutar creación con datos inválidos
+        HttpResponseMessage respuesta = await cliente.PostAsJsonAsync("/api/transacciones", requestInvalido);
+
+        // ASSERT: Verificar que el servidor retorne 400 BadRequest
+        Assert.Equal(HttpStatusCode.BadRequest, respuesta.StatusCode);
+    }
+
+    /// <summary>
+    /// Valida que GET /api/transacciones/{id} retorne 200 Ok con los datos correctos cuando la transacción existe
+    /// </summary>
+    [Fact]
+    public async Task ObtenerTransaccionPorId_CuandoExiste_Retorna200()
+    {
+        // ARRANGE: Crear una transacción y capturar su identificador
+        await ReiniciarBaseAsync();
+        using HttpClient cliente = _factory.CreateClient();
+        await InsertarTransaccionAsync("Compra", 4, 15m, "Compra para búsqueda por id");
+
+        using IServiceScope alcanceConfig = _factory.Services.CreateScope();
+        TransaccionDbContext contextoDbConfig = alcanceConfig.ServiceProvider.GetRequiredService<TransaccionDbContext>();
+        TransaccionEntidad transaccionInsertada = await contextoDbConfig.Transacciones.FirstAsync();
+
+        // ACT: Consultar la transacción por su identificador
+        HttpResponseMessage respuesta = await cliente.GetAsync($"/api/transacciones/{transaccionInsertada.Id}");
+
+        // ASSERT: Verificar código 200 y datos correctos en el cuerpo
+        Assert.Equal(HttpStatusCode.OK, respuesta.StatusCode);
+        TransaccionResponse? contenido = await respuesta.Content.ReadFromJsonAsync<TransaccionResponse>();
+        Assert.NotNull(contenido);
+        Assert.Equal(transaccionInsertada.Id, contenido!.Id);
+        Assert.Equal("Compra", contenido.TipoTransaccion);
+        Assert.Equal(60m, contenido.PrecioTotal);
+        Assert.Equal("Compra para búsqueda por id", contenido.Detalle);
+    }
+
+    /// <summary>
+    /// Valida que PUT /api/transacciones/{id} retorne 404 NotFound cuando la transacción no existe
+    /// </summary>
+    [Fact]
+    public async Task ActualizarTransaccion_CuandoNoExiste_Retorna404()
+    {
+        // ARRANGE: Preparar base limpia y un identificador inexistente
+        await ReiniciarBaseAsync();
+        using HttpClient cliente = _factory.CreateClient();
+        Guid idNoExistente = Guid.NewGuid();
+
+        ActualizarTransaccionRequest request = new()
+        {
+            TipoTransaccion = "Venta",
+            ProductoId = Guid.NewGuid(),
+            Cantidad = 2,
+            PrecioUnitario = 30m,
+            Detalle = "Actualización fallida"
+        };
+
+        // ACT: Ejecutar actualización HTTP con identificador inexistente
+        HttpResponseMessage respuesta = await cliente.PutAsJsonAsync($"/api/transacciones/{idNoExistente}", request);
+
+        // ASSERT: Verificar respuesta 404 NotFound
+        Assert.Equal(HttpStatusCode.NotFound, respuesta.StatusCode);
+    }
+
+    /// <summary>
+    /// Valida que DELETE /api/transacciones/{id} retorne 404 NotFound cuando la transacción no existe
+    /// </summary>
+    [Fact]
+    public async Task EliminarTransaccion_CuandoNoExiste_Retorna404()
+    {
+        // ARRANGE: Preparar base limpia y un identificador inexistente
+        await ReiniciarBaseAsync();
+        using HttpClient cliente = _factory.CreateClient();
+        Guid idNoExistente = Guid.NewGuid();
+
+        // ACT: Ejecutar eliminación HTTP con identificador inexistente
+        HttpResponseMessage respuesta = await cliente.DeleteAsync($"/api/transacciones/{idNoExistente}");
+
+        // ASSERT: Verificar respuesta 404 NotFound
+        Assert.Equal(HttpStatusCode.NotFound, respuesta.StatusCode);
+    }
+
+    /// <summary>
     /// Reinicia la base InMemory de transacciones para garantizar independencia entre pruebas
     /// </summary>
     private async Task ReiniciarBaseAsync()
