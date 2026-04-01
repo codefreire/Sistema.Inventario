@@ -8,6 +8,7 @@ using Sistema.Inventario.Producto.Aplicacion.Servicios;
 using Sistema.Inventario.Producto.Aplicacion.Validators;
 using Sistema.Inventario.Producto.Infraestructura.Persistencia;
 using Sistema.Inventario.Producto.Infraestructura.Repositorios;
+using Sistema.Inventario.Storage.Extensiones;
 
 namespace Sistema.Inventario.Producto.API.Extensiones;
 
@@ -25,6 +26,7 @@ public static class ExtensionesServicios
     public static IServiceCollection AddProductos(this IServiceCollection servicios, IConfiguration configuracion)
     {
         servicios.AddHealthChecks();
+        servicios.AddAlmacenamiento();
 
         servicios.AddDbContext<ProductoDbContext>(opciones =>
             opciones.UseSqlServer(configuracion.GetConnectionString("cnInventarioProductosBD")));
