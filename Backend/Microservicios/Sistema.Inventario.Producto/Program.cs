@@ -2,7 +2,41 @@ using Sistema.Inventario.Producto.API.Extensiones;
 using Sistema.Inventario.Producto.API.Middlewares;
 using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+static string ResolverRutaProyectoProducto()
+{
+    string[] rutasBase =
+    [
+        Directory.GetCurrentDirectory(),
+        AppContext.BaseDirectory
+    ];
+
+    foreach (string rutaBase in rutasBase)
+    {
+        DirectoryInfo? directorio = new DirectoryInfo(rutaBase);
+        while (directorio is not null)
+        {
+            string rutaCsproj = Path.Combine(directorio.FullName, "Sistema.Inventario.Producto.csproj");
+            if (File.Exists(rutaCsproj))
+            {
+                return directorio.FullName;
+            }
+
+            directorio = directorio.Parent;
+        }
+    }
+
+    return Directory.GetCurrentDirectory();
+}
+
+string rutaProyecto = ResolverRutaProyectoProducto();
+var opcionesAplicacion = new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = rutaProyecto,
+    WebRootPath = Path.Combine(rutaProyecto, "wwwroot")
+};
+
+var builder = WebApplication.CreateBuilder(opcionesAplicacion);
 
 Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
 builder.Logging.AddSerilog(Log.Logger, dispose: true);

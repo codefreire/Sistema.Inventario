@@ -9,6 +9,15 @@ namespace Sistema.Inventario.Transaccion.Infraestructura.ClientesExternos;
 public class ProductoApiCliente : IProductoApiCliente
 {
     /// <summary>
+    /// DTO interno para el payload de ajuste de stock.
+    /// </summary>
+    private sealed class AjustarStockRequest
+    {
+        public int Cantidad { get; init; }
+        public string TipoOperacion { get; init; } = string.Empty;
+    }
+
+    /// <summary>
     /// Cliente HTTP para realizar las solicitudes al microservicio de Productos
     /// </summary>
     private readonly HttpClient _httpClient;
@@ -66,7 +75,11 @@ public class ProductoApiCliente : IProductoApiCliente
     {
         try
         {
-            var requestBody = new { Cantidad = cantidad, TipoOperacion = tipoOperacion };
+            AjustarStockRequest requestBody = new AjustarStockRequest
+            {
+                Cantidad = cantidad,
+                TipoOperacion = tipoOperacion
+            };
             HttpResponseMessage response = await _httpClient.PatchAsJsonAsync($"api/productos/{productoId}/stock", requestBody);
 
             if (!response.IsSuccessStatusCode)
