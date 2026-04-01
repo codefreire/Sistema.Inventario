@@ -56,8 +56,9 @@ export default function TransaccionesPage() {
       await transaccionService.eliminar(modalEliminar.transaccion.id);
       mostrarNotificacion('Transacción eliminada correctamente.', 'exito');
       recargar();
-    } catch {
-      mostrarNotificacion('Error al eliminar la transacción.', 'error');
+    } catch (error) {
+      const mensaje = error instanceof Error ? error.message : 'Error al eliminar la transacción.';
+      mostrarNotificacion(mensaje, 'error');
     } finally {
       setModalEliminar({ visible: false, transaccion: null });
     }

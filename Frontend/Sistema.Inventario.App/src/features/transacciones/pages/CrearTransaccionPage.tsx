@@ -24,8 +24,9 @@ export default function CrearTransaccionPage() {
   const [notificacion, setNotificacion] = useState({ mensaje: '', tipo: 'exito' as 'exito' | 'error', visible: false });
 
   useEffect(() => {
-    productoService.obtenerTodos().then(setProductos).catch(() => {
-      setNotificacion({ mensaje: 'Error al cargar los productos.', tipo: 'error', visible: true });
+    productoService.obtenerTodos().then(setProductos).catch((error) => {
+      const mensaje = error instanceof Error ? error.message : 'Error al cargar los productos.';
+      setNotificacion({ mensaje, tipo: 'error', visible: true });
     });
   }, []);
 
@@ -59,8 +60,9 @@ export default function CrearTransaccionPage() {
       await transaccionService.crear(formulario);
       setNotificacion({ mensaje: 'Transacción creada correctamente.', tipo: 'exito', visible: true });
       setTimeout(() => navigate('/transacciones'), 1500);
-    } catch {
-      setNotificacion({ mensaje: 'Error al crear la transacción.', tipo: 'error', visible: true });
+    } catch (error) {
+      const mensaje = error instanceof Error ? error.message : 'Error al crear la transacción.';
+      setNotificacion({ mensaje, tipo: 'error', visible: true });
     } finally {
       setEnviando(false);
     }

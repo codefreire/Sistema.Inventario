@@ -40,8 +40,9 @@ export default function EditarTransaccionPage() {
           precioUnitario: transaccion.precioUnitario,
           detalle: transaccion.detalle,
         });
-      } catch {
-        setNotificacion({ mensaje: 'Error al cargar la transacción.', tipo: 'error', visible: true });
+      } catch (error) {
+        const mensaje = error instanceof Error ? error.message : 'Error al cargar la transacción.';
+        setNotificacion({ mensaje, tipo: 'error', visible: true });
       } finally {
         setCargando(false);
       }
@@ -61,7 +62,7 @@ export default function EditarTransaccionPage() {
     setFormulario((prev) => ({
       ...prev,
       productoId,
-      precioUnitario: producto ? producto.precio : prev.precioUnitario,
+      precioUnitario: producto ? producto.precio : 0,
     }));
     setErrores((prev) => ({ ...prev, productoId: undefined }));
   };
@@ -79,8 +80,9 @@ export default function EditarTransaccionPage() {
       await transaccionService.actualizar(id!, formulario);
       setNotificacion({ mensaje: 'Transacción actualizada correctamente.', tipo: 'exito', visible: true });
       setTimeout(() => navigate('/transacciones'), 1500);
-    } catch {
-      setNotificacion({ mensaje: 'Error al actualizar la transacción.', tipo: 'error', visible: true });
+    } catch (error) {
+      const mensaje = error instanceof Error ? error.message : 'Error al actualizar la transacción.';
+      setNotificacion({ mensaje, tipo: 'error', visible: true });
     } finally {
       setEnviando(false);
     }
