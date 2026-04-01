@@ -43,6 +43,11 @@ public class ProductosController : ControllerBase
     private readonly AjustarStockHandler _ajustarStockHandler;
 
     /// <summary>
+    /// Handler para subir imágenes de Producto
+    /// </summary>
+    private readonly SubirImagenProductoHandler _subirImagenHandler;
+
+    /// <summary>
     /// Constructor del controlador de Productos
     /// </summary>
     /// <param name="obtenerProductosHandler">Handler para obtener la lista de Productos</param>
@@ -51,7 +56,8 @@ public class ProductosController : ControllerBase
     /// <param name="actualizarProductoHandler">Handler para actualizar un Producto</param>
     /// <param name="eliminarProductoHandler">Handler para eliminar un Producto</param>
     /// <param name="ajustarStockHandler">Handler para ajustar el stock de un Producto</param>
-    public ProductosController(ObtenerProductosHandler obtenerProductosHandler, ObtenerProductoHandler obtenerProductoHandler, CrearProductoHandler crearProductoHandler, ActualizarProductoHandler actualizarProductoHandler, EliminarProductoHandler eliminarProductoHandler, AjustarStockHandler ajustarStockHandler)
+    /// <param name="subirImagenHandler">Handler para subir imágenes de Producto</param>
+    public ProductosController(ObtenerProductosHandler obtenerProductosHandler, ObtenerProductoHandler obtenerProductoHandler, CrearProductoHandler crearProductoHandler, ActualizarProductoHandler actualizarProductoHandler, EliminarProductoHandler eliminarProductoHandler, AjustarStockHandler ajustarStockHandler, SubirImagenProductoHandler subirImagenHandler)
     {
         _obtenerProductosHandler = obtenerProductosHandler;
         _obtenerProductoHandler = obtenerProductoHandler;
@@ -59,6 +65,7 @@ public class ProductosController : ControllerBase
         _actualizarProductoHandler = actualizarProductoHandler;
         _eliminarProductoHandler = eliminarProductoHandler;
         _ajustarStockHandler = ajustarStockHandler;
+        _subirImagenHandler = subirImagenHandler;
     }
 
     /// <summary>
@@ -148,5 +155,26 @@ public class ProductosController : ControllerBase
             return BadRequest($"No se pudo ajustar el stock del producto con Id {idRequest.Id}. Verifique que el producto exista y que haya stock suficiente.");
         }
         return Ok(producto);
+    }
+
+    /// <summary>
+    /// Endpoint para subir una imagen de Producto al almacenamiento local.
+    /// Devuelve la URL pública que puede usarse como <c>imagenUrl</c> al crear o actualizar un Producto.
+    /// </summary>
+    /// <param name="archivo">Archivo de imagen (jpg, jpeg, png o webp, máximo 5 MB)</param>
+    /// <returns>URL pública de la imagen almacenada</returns>
+    [HttpPost("imagenes")]
+    [Consumes("multipart/form-data")]
+    public async Task<ActionResult<SubirImagenResponse>> SubirImagen([FromForm] IFormFile archivo)
+    {
+        try
+        {
+            SubirImagenResponse respuesta = await _subirImagenHandler.Handle(archivo);
+            return Ok(respuesta);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }
