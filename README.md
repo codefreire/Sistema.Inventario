@@ -218,6 +218,7 @@ Endpoints útiles:
 
 - Gateway: `http://localhost:7000`
 - Swagger Gateway: `http://localhost:7000/swagger`
+- Health check: `http://localhost:7000/health`
 
 Rutas principales a través del gateway:
 

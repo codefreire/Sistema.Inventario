@@ -4,11 +4,14 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configuración de Serilog para logging
 Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
 builder.Logging.AddSerilog(Log.Logger, dispose: true);
 
+// Configuración de Health Checks para monitoreo de salud del API Gateway
 builder.Services.AddHealthChecks();
 
+// Configuración de CORS para permitir solicitudes desde el frontend
 string[] origenesPermitidos = builder.Configuration.GetSection("Cors:origenesPermitidos").Get<string[]>() ?? Array.Empty<string>();
 builder.Services.AddCors(opciones =>
 {
@@ -23,10 +26,13 @@ builder.Services.AddCors(opciones =>
     });
 });
 
+// Configuración de Ocelot para el API Gateway
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
 builder.Services.AddOcelot(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
+
+// Configuración de Swagger para Ocelot
 builder.Services.AddSwaggerForOcelot(builder.Configuration);
 
 var app = builder.Build();
