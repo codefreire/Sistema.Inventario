@@ -10,7 +10,7 @@ describe('validarProducto', () => {
      * Verifica que un producto con datos validos no genere errores.
      */
     it('ValidarProducto_CuandoElProductoEsValido_DebeRetornarSinErrores', () => {
-        // ARRANGE:
+        // ARRANGE: Preparar un producto con todos los campos requeridos y valores validos
         const productoValido: CrearProductoRequest = {
             nombre: 'Teclado Mecanico',
             descripcion: 'Teclado para oficina',
@@ -20,10 +20,10 @@ describe('validarProducto', () => {
             stock: 10,
         };
 
-        // ACT:
+        // ACT: Ejecutar la validacion del producto
         const resultado = validarProducto(productoValido);
 
-        // ASSERT:
+        // ASSERT: Verificar que no existan errores de validacion
         expect(resultado).toEqual({});
         expect(tieneErrores(resultado)).toBe(false);
     });
@@ -32,7 +32,7 @@ describe('validarProducto', () => {
      * Verifica que se retornen errores cuando faltan campos obligatorios.
      */
     it('ValidarProducto_CuandoFaltanCamposObligatorios_DebeRetornarErroresPorCampo', () => {
-        // ARRANGE:
+        // ARRANGE: Preparar un producto invalido con todos los campos obligatorios vacios
         const productoInvalido = {
             nombre: '',
             descripcion: '',
@@ -42,10 +42,10 @@ describe('validarProducto', () => {
             stock: null,
         } as unknown as CrearProductoRequest;
 
-        // ACT:
+        // ACT: Ejecutar la validacion del producto invalido
         const resultado = validarProducto(productoInvalido);
 
-        // ASSERT:
+        // ASSERT: Verificar que se retornen los mensajes de error esperados por campo
         expect(resultado.nombre).toBe('El nombre es obligatorio.');
         expect(resultado.descripcion).toBe('La descripción es obligatoria.');
         expect(resultado.categoria).toBe('La categoría es obligatoria.');

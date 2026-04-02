@@ -9,7 +9,7 @@ describe('formatearMoneda', () => {
      * Verifica que el formato aplicado sea el esperado para es-EC y USD.
      */
     it('FormatearMoneda_CuandoRecibeValorNumerico_DebeAplicarFormatoMonedaUsd', () => {
-        // ARRANGE:
+        // ARRANGE: Preparar un valor numerico y el formato esperado con Intl.NumberFormat
         const valor = 1234.5;
         const formatoEsperado = new Intl.NumberFormat('es-EC', {
             style: 'currency',
@@ -17,10 +17,10 @@ describe('formatearMoneda', () => {
             minimumFractionDigits: 2,
         }).format(valor);
 
-        // ACT:
+        // ACT: Ejecutar la utilidad de formato monetario
         const resultado = formatearMoneda(valor);
 
-        // ASSERT:
+        // ASSERT: Verificar que el valor se formatee exactamente como USD en es-EC
         expect(resultado).toBe(formatoEsperado);
     });
 });

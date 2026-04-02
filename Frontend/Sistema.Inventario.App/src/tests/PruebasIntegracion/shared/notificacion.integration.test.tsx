@@ -11,7 +11,7 @@ describe('Notificacion', () => {
    * Verifica que la notificacion visible se cierre automaticamente tras 4 segundos.
    */
   it('AutoCerrar_CuandoLaNotificacionEsVisible_DebeInvocarOnCerrar', async () => {
-    // ARRANGE:
+    // ARRANGE: Activar timers simulados y renderizar una notificacion visible
     vi.useFakeTimers();
     const alCerrar = vi.fn();
 
@@ -24,10 +24,10 @@ describe('Notificacion', () => {
       />
     );
 
-    // ACT:
+    // ACT: Avanzar el tiempo simulado hasta el auto-cierre configurado
     vi.advanceTimersByTime(4000);
 
-    // ASSERT:
+    // ASSERT: Verificar que el callback de cierre se invoque una sola vez
     expect(alCerrar).toHaveBeenCalledTimes(1);
 
     vi.useRealTimers();
@@ -37,7 +37,7 @@ describe('Notificacion', () => {
    * Verifica que cuando no esta visible, no se renderiza contenido en pantalla.
    */
   it('Renderizar_CuandoVisibleEsFalse_DebeRetornarNulo', () => {
-    // ARRANGE:
+    // ARRANGE: Renderizar la notificacion en estado oculto
     const alCerrar = vi.fn();
 
     renderConProveedores(
@@ -49,10 +49,10 @@ describe('Notificacion', () => {
       />
     );
 
-    // ACT:
+    // ACT: Consultar si existe el boton de cierre en el DOM
     const botonCerrar = screen.queryByRole('button');
 
-    // ASSERT:
+    // ASSERT: Verificar que no se renderice contenido interactivo visible
     expect(botonCerrar).toBeNull();
   });
 });

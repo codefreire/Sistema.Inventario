@@ -11,13 +11,13 @@ describe('Button', () => {
      * Verifica que el boton renderice la clase segun la variante indicada.
      */
     it('Button_CuandoSeRenderizaConVariantePeligro_DebeAplicarClaseCorrespondiente', () => {
-        // ARRANGE:
+        // ARRANGE: Renderizar el boton con la variante de peligro
         renderConProveedores(<Button variante="peligro">Eliminar</Button>);
 
-        // ACT:
+        // ACT: Obtener el boton renderizado desde el DOM
         const boton = screen.getByRole('button', { name: 'Eliminar' });
 
-        // ASSERT:
+        // ASSERT: Verificar que se apliquen las clases visuales esperadas
         expect(boton).toHaveClass('btn');
         expect(boton).toHaveClass('btn-peligro');
     });
@@ -26,7 +26,7 @@ describe('Button', () => {
      * Verifica que al hacer click se invoque el callback onClick.
      */
     it('Button_CuandoSeHaceClick_DebeInvocarOnClickUnaVez', () => {
-        // ARRANGE:
+        // ARRANGE: Renderizar el boton con un callback espia para el evento click
         const alHacerClick = vi.fn();
         renderConProveedores(
             <Button variante="primario" onClick={alHacerClick}>
@@ -35,10 +35,10 @@ describe('Button', () => {
         );
         const boton = screen.getByRole('button', { name: 'Guardar' });
 
-        // ACT:
+        // ACT: Ejecutar un clic sobre el boton renderizado
         fireEvent.click(boton);
 
-        // ASSERT:
+        // ASSERT: Verificar que el callback se invoque exactamente una vez
         expect(alHacerClick).toHaveBeenCalledTimes(1);
     });
 });

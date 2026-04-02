@@ -12,7 +12,7 @@ describe('FiltrosProductos', () => {
      * Verifica que al cambiar el nombre se notifique el filtro actualizado.
      */
     it('CambiarNombre_CuandoSeIngresaTexto_DebeEmitirFiltrosActualizados', () => {
-        // ARRANGE:
+        // ARRANGE: Renderizar el componente con filtros vacios y callback espia
         const alCambiarFiltros = vi.fn();
         const filtrosIniciales: FiltrosProducto = {};
 
@@ -22,10 +22,10 @@ describe('FiltrosProductos', () => {
 
         const inputNombre = screen.getByPlaceholderText('Buscar por nombre...');
 
-        // ACT:
+        // ACT: Ingresar un valor en el campo de nombre
         fireEvent.change(inputNombre, { target: { value: 'Laptop' } });
 
-        // ASSERT:
+        // ASSERT: Verificar que se emita el filtro actualizado con el nombre ingresado
         expect(alCambiarFiltros).toHaveBeenCalledTimes(1);
         expect(alCambiarFiltros).toHaveBeenCalledWith({ nombre: 'Laptop' });
     });
@@ -34,7 +34,7 @@ describe('FiltrosProductos', () => {
      * Verifica que al limpiar filtros se emita un objeto vacio.
      */
     it('LimpiarFiltros_CuandoSePresionaBoton_DebeEmitirObjetoVacio', () => {
-        // ARRANGE:
+        // ARRANGE: Renderizar el componente con filtros cargados previamente
         const alCambiarFiltros = vi.fn();
         const filtrosIniciales: FiltrosProducto = { nombre: 'Mouse', stockMin: 1 };
 
@@ -44,10 +44,10 @@ describe('FiltrosProductos', () => {
 
         const botonLimpiar = screen.getByRole('button', { name: 'Limpiar Filtros' });
 
-        // ACT:
+        // ACT: Hacer clic en el boton para limpiar filtros
         fireEvent.click(botonLimpiar);
 
-        // ASSERT:
+        // ASSERT: Verificar que se emita un objeto vacio como nuevo estado de filtros
         expect(alCambiarFiltros).toHaveBeenCalledTimes(1);
         expect(alCambiarFiltros).toHaveBeenCalledWith({});
     });

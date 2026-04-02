@@ -4,11 +4,17 @@ import ConsultarProductoPage from '../../../../features/productos/pages/Consulta
 import * as productoService from '../../../../features/productos/services/productoService';
 import { renderConProveedores } from '../../../setup/testUtils';
 
+/**
+ * Mock del servicio de productos para controlar respuestas de consulta.
+ */
 vi.mock('../../../../features/productos/services/productoService');
 
 const mockNavigate = vi.fn();
 const mockParams = { id: 'prod-123' };
 
+/**
+ * Mock de react-router-dom para simular parametros y navegacion.
+ */
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
@@ -18,6 +24,9 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
+/**
+ * Pruebas de integracion para la pagina ConsultarProductoPage.
+ */
 describe('ConsultarProductoPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -34,11 +43,14 @@ describe('ConsultarProductoPage', () => {
     });
   });
 
+  /**
+   * Verifica que se carguen y muestren los datos del producto consultado.
+   */
   it('DebeCargarYMostrarDatosDelProducto', async () => {
-    // ARRANGE:
+    // ARRANGE: Renderizar la pagina con un producto configurado en el mock del servicio
     renderConProveedores(<ConsultarProductoPage />);
 
-    // ASSERT:
+    // ASSERT: Verificar que se consulten y muestren los datos esperados del producto
     await waitFor(() => {
       expect(productoService.productoService.obtenerPorId).toHaveBeenCalledWith('prod-123');
       expect(screen.getByDisplayValue('Mesa')).toBeInTheDocument();
@@ -49,43 +61,53 @@ describe('ConsultarProductoPage', () => {
     });
   });
 
+  /**
+   * Verifica que el boton de retorno navegue al listado de productos.
+   */
   it('VolverAProductos_CuandoSePresionaBoton_DebeNavegarAListado', async () => {
-    // ARRANGE:
+    // ARRANGE: Renderizar la pagina y esperar a que el boton de retorno este disponible
     renderConProveedores(<ConsultarProductoPage />);
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /volver a productos/i })).toBeInTheDocument();
     });
 
-    // ACT:
+    // ACT: Hacer clic en el boton para volver al listado
     fireEvent.click(screen.getByRole('button', { name: /volver a productos/i }));
 
-    // ASSERT:
+    // ASSERT: Verificar que se navegue a la ruta principal de productos
     expect(mockNavigate).toHaveBeenCalledWith('/productos');
   });
 
+  /**
+   * Verifica que el boton de edicion navegue al formulario de actualizacion.
+   */
   it('IrAEdicion_CuandoSePresionaBoton_DebeNavegarAEditarProducto', async () => {
-    // ARRANGE:
+    // ARRANGE: Renderizar la pagina y esperar a que el boton de edicion este visible
     renderConProveedores(<ConsultarProductoPage />);
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /ir a edición/i })).toBeInTheDocument();
     });
 
-    // ACT:
+    // ACT: Hacer clic en el boton para ir al formulario de edicion
     fireEvent.click(screen.getByRole('button', { name: /ir a edición/i }));
 
-    // ASSERT:
+    // ASSERT: Verificar que la navegacion apunte a la ruta de edicion del producto
     expect(mockNavigate).toHaveBeenCalledWith('/productos/editar/prod-123');
   });
 
+  /**
+   * Verifica que cuando la consulta falle se muestre una notificacion de error.
+   */
   it('ErrorAlConsultar_CuandoServicioFalla_DebeMostrarNotificacion', async () => {
-    // ARRANGE:
+    // ARRANGE: Configurar el servicio para que falle al consultar el producto
     vi.mocked(productoService.productoService.obtenerPorId).mockRejectedValueOnce(new Error('Producto no encontrado'));
 
+    // ACT: Renderizar la pagina con el escenario de error configurado
     renderConProveedores(<ConsultarProductoPage />);
 
-    // ASSERT:
+    // ASSERT: Verificar que se informe el error y permanezca disponible la accion de retorno
     await waitFor(() => {
       expect(screen.getByText(/producto no encontrado/i)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /volver a productos/i })).toBeInTheDocument();
