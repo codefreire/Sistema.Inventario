@@ -161,20 +161,19 @@ public class ProductosController : ControllerBase
     /// Endpoint para subir una imagen de Producto al almacenamiento
     /// Devuelve la URL que se usa al crear o actualizar un Producto
     /// </summary>
-    /// <param name="archivo">Archivo de imagen enviado con el campo <c>archivo</c></param>
-    /// <param name="archivoImagen">Archivo de imagen enviado con el campo <c>archivoImagen</c></param>
+    /// <param name="archivoImagen">Archivo de imagen enviado por formulario multipart</param>
     /// <returns>URL de la imagen almacenada</returns>
     [HttpPost("imagenes")]
     [Consumes("multipart/form-data")]
-    public async Task<ActionResult<SubirImagenResponse>> SubirImagen([FromForm] IFormFile? archivo, [FromForm] IFormFile? archivoImagen)
+    public async Task<ActionResult<SubirImagenResponse>> SubirImagen([FromForm] IFormFile? archivoImagen)
     {
-        IFormFile? archivoSubida = archivoImagen ?? archivo;
-        if (archivoSubida is null)
+        IFormFile? archivoSubido = archivoImagen ?? Request.Form.Files.FirstOrDefault();
+        if (archivoSubido is null)
         {
-            return BadRequest("Debe enviar un archivo en el campo 'archivo' o 'archivoImagen'.");
+            return BadRequest("Debe enviar un archivo en el formulario multipart.");
         }
 
-        SubirImagenResponse respuesta = await _subirImagenHandler.Handle(archivoSubida);
+        SubirImagenResponse respuesta = await _subirImagenHandler.Handle(archivoSubido);
         return Ok(respuesta);
     }
 }
