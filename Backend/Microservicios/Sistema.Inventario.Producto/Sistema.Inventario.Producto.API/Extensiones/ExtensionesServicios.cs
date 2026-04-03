@@ -32,11 +32,11 @@ public static class ExtensionesServicios
         // Agrega el servicio de almacenamiento para manejar las imágenes de los productos
         servicios.AddAlmacenamiento();
 
-        // Configurar DbContext para el microservicio de Productos
+        // Agrega DbContext para el microservicio de Productos
         servicios.AddDbContext<ProductoDbContext>(opciones =>
             opciones.UseSqlServer(configuracion.GetConnectionString("cnInventarioProductosBD")));
 
-        // Configurar Swagger para la documentación de la API
+        // Agrega Swagger para la documentación de la API
         servicios.AddSwaggerGen(opciones =>
         {
             opciones.SwaggerDoc("v1", new OpenApiInfo

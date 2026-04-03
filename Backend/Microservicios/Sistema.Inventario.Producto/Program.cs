@@ -2,6 +2,7 @@ using Sistema.Inventario.Producto.API.Extensiones;
 using Sistema.Inventario.Producto.API.Middlewares;
 using Serilog;
 
+// Resolver la ruta del proyecto para configurar correctamente el ContentRootPath y WebRootPath para el almacenamiento de archivos imagen
 static string ResolverRutaProyectoProducto()
 {
     string[] rutasBase =
@@ -27,7 +28,6 @@ static string ResolverRutaProyectoProducto()
 
     return Directory.GetCurrentDirectory();
 }
-
 string rutaProyecto = ResolverRutaProyectoProducto();
 var opcionesAplicacion = new WebApplicationOptions
 {
@@ -38,6 +38,7 @@ var opcionesAplicacion = new WebApplicationOptions
 
 var builder = WebApplication.CreateBuilder(opcionesAplicacion);
 
+// Configuración de Serilog
 Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
 builder.Logging.AddSerilog(Log.Logger, dispose: true);
 
