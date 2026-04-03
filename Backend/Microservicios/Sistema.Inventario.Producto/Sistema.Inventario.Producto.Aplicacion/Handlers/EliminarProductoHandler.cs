@@ -1,4 +1,3 @@
-using Sistema.Inventario.Producto.Aplicacion.DTOs.Requests;
 using Sistema.Inventario.Producto.Aplicacion.Servicios;
 
 namespace Sistema.Inventario.Producto.Aplicacion.Handlers;

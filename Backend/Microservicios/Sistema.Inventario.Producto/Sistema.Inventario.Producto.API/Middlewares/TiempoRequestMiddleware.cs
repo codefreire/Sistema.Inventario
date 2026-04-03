@@ -49,8 +49,8 @@ public static class TiempoRequestMiddlewareExtensions
     /// <summary>
     /// Agrega el middleware de tiempo de request al pipeline HTTP
     /// </summary>
-    /// <param name="appBuilder">Aplicacion HTTP</param>
-    /// <returns>Builder de la aplicacion</returns>
+    /// <param name="appBuilder">Aplicación HTTP</param>
+    /// <returns>Builder de la aplicación</returns>
     public static IApplicationBuilder UseTiempoRequest(this IApplicationBuilder appBuilder)
     {
         return appBuilder.UseMiddleware<TiempoRequestMiddleware>();

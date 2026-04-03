@@ -8,6 +8,7 @@ using Sistema.Inventario.Producto.Aplicacion.Servicios;
 using Sistema.Inventario.Producto.Aplicacion.Validators;
 using Sistema.Inventario.Producto.Infraestructura.Persistencia;
 using Sistema.Inventario.Producto.Infraestructura.Repositorios;
+
 using Sistema.Inventario.Storage.Extensiones;
 
 namespace Sistema.Inventario.Producto.API.Extensiones;
@@ -25,12 +26,17 @@ public static class ExtensionesServicios
     /// <returns>Colección de servicios</returns>
     public static IServiceCollection AddProductos(this IServiceCollection servicios, IConfiguration configuracion)
     {
+        // Agregar servicios de Health Checks para el microservicio de Productos
         servicios.AddHealthChecks();
+
+        // Agrega el servicio de almacenamiento para manejar las imágenes de los productos
         servicios.AddAlmacenamiento();
 
+        // Configurar DbContext para el microservicio de Productos
         servicios.AddDbContext<ProductoDbContext>(opciones =>
             opciones.UseSqlServer(configuracion.GetConnectionString("cnInventarioProductosBD")));
 
+        // Configurar Swagger para la documentación de la API
         servicios.AddSwaggerGen(opciones =>
         {
             opciones.SwaggerDoc("v1", new OpenApiInfo
@@ -50,6 +56,7 @@ public static class ExtensionesServicios
             opciones.IncludeXmlComments(xmlPath);
         });
 
+        // Registrar repositorios, servicios y handlers del microservicio de Productos
         servicios.AddScoped<IProductoRepositorio, ProductoRepositorio>();
         servicios.AddScoped<IProductoServicio, ProductoServicio>();
         servicios.AddScoped<ObtenerProductosHandler>();
@@ -60,6 +67,7 @@ public static class ExtensionesServicios
         servicios.AddScoped<AjustarStockHandler>();
         servicios.AddScoped<SubirImagenProductoHandler>();
 
+        // Configurar FluentValidation para validar las solicitudes de la API
         servicios.AddFluentValidationAutoValidation();
         servicios.AddValidatorsFromAssemblyContaining<ObtenerProductoPorIdValidator>();
         servicios.AddValidatorsFromAssemblyContaining<CrearProductoValidator>();
