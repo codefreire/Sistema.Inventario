@@ -94,6 +94,7 @@ Notas de arquitectura:
 ### Módulos del proyecto
 
 1. `Backend/Gateway/Sistema.Inventario.ApiGateway`
+    - Plantilla: `web`.
     - Puerta de entrada única del frontend.
     - Enrutamiento Ocelot a microservicios.
     - CORS configurado para `http://localhost:5173`.
@@ -101,11 +102,13 @@ Notas de arquitectura:
     - Observabilidad con Serilog a `logs/log-.txt`.
 
 2. `Backend/Storage/Sistema.Inventario.Storage`
+    - Plantilla: `classlib`.
     - Librería compartida para almacenamiento de archivos.
     - Validación de extensión/tamaño de imagen.
-    - Escritura en `wwwroot/uploads` y retorno de URL pública.
+    - Escritura en `wwwroot/imagenes` y retorno de URL pública.
 
 3. `Backend/Microservicios/Sistema.Inventario.Producto`
+    - Plantilla: `webapi`.
     - Arquitectura limpia por capas: API, Aplicación, Dominio, Infraestructura.
     - CRUD de productos, ajuste de stock y endpoint multipart para imágenes.
     - Static files habilitados para servir imágenes subidas.
@@ -113,13 +116,15 @@ Notas de arquitectura:
     - Logging con Serilog en `logs/log-.txt`.
 
 4. `Backend/Microservicios/Sistema.Inventario.Transaccion`
+    - Plantilla: `webapi`.
     - Arquitectura limpia por capas: API, Aplicación, Dominio, Infraestructura.
     - CRUD de transacciones con reglas de negocio de compra/venta.
     - Validación de stock y ajuste de stock en Productos vía HttpClient síncrono.
     - FluentValidation, health check, middleware de tiempo de request.
     - Logging con Serilog en `logs/log-.txt`.
 
-5. `Backend/Tests`
+5. `Backend/Tests/Sistema.Inventario.Producto.Tests` y `Backend/Tests/Sistema.Inventario.Transaccion.Tests`
+    - Plantilla: `xunit`.
     - `Sistema.Inventario.Producto.Tests` y `Sistema.Inventario.Transaccion.Tests`.
     - Pruebas unitarias + integración (xUnit/Moq/WebApplicationFactory).
     - Convención AAA explícita (Arrange, Act, Assert).

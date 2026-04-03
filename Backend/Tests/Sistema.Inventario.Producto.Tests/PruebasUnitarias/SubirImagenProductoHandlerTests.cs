@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using Sistema.Inventario.Producto.Aplicacion.DTOs.Responses;
 using Sistema.Inventario.Producto.Aplicacion.Handlers;
-using Sistema.Inventario.Storage.DTOs;
+using Sistema.Inventario.Storage.DTOs.Requests;
+using Sistema.Inventario.Storage.DTOs.Responses;
 using Sistema.Inventario.Storage.Servicios;
 
 namespace Sistema.Inventario.Producto.Tests.PruebasUnitarias;
@@ -36,16 +37,16 @@ public class SubirImagenProductoHandlerTests
         archivoMock.Setup(a => a.FileName).Returns("imagen.jpg");
         archivoMock.Setup(a => a.Length).Returns(1024);
 
-        string urlEsperada = "http://localhost:5261/uploads/abc123.jpg";
+        string urlEsperada = "http://localhost:5261/imagenes/abc123.jpg";
 
         _almacenamientoServicioMock
-            .Setup(s => s.GuardarArchivoAsync(It.IsAny<SubirArchivoRequest>()))
-            .ReturnsAsync(new ArchivoSubidoResponse
+            .Setup(s => s.GuardarArchivoAsync(It.IsAny<ArchivoImagenRequest>()))
+            .ReturnsAsync(new ArchivoImagenResponse
             {
                 NombreArchivo = "abc123.jpg",
-                UrlPublica = urlEsperada,
+                UrlImagen = urlEsperada,
                 TipoContenido = "image/jpeg",
-                TamanoBytes = 1024
+                TamanioBytes = 1024
             });
 
         SubirImagenProductoHandler handler = CrearHandler();
@@ -70,7 +71,7 @@ public class SubirImagenProductoHandlerTests
         archivoMock.Setup(a => a.Length).Returns(512);
 
         _almacenamientoServicioMock
-            .Setup(s => s.GuardarArchivoAsync(It.IsAny<SubirArchivoRequest>()))
+            .Setup(s => s.GuardarArchivoAsync(It.IsAny<ArchivoImagenRequest>()))
             .ThrowsAsync(new ArgumentException("La extensión del archivo no está permitida. Use jpg, jpeg, png o webp."));
 
         SubirImagenProductoHandler handler = CrearHandler();
@@ -94,13 +95,13 @@ public class SubirImagenProductoHandlerTests
         archivoMock.Setup(a => a.Length).Returns(2048);
 
         _almacenamientoServicioMock
-            .Setup(s => s.GuardarArchivoAsync(It.IsAny<SubirArchivoRequest>()))
-            .ReturnsAsync(new ArchivoSubidoResponse
+            .Setup(s => s.GuardarArchivoAsync(It.IsAny<ArchivoImagenRequest>()))
+            .ReturnsAsync(new ArchivoImagenResponse
             {
                 NombreArchivo = "foto.png",
-                UrlPublica = "http://localhost:5261/uploads/foto.png",
+                UrlImagen = "http://localhost:5261/imagenes/foto.png",
                 TipoContenido = "image/png",
-                TamanoBytes = 2048
+                TamanioBytes = 2048
             });
 
         SubirImagenProductoHandler handler = CrearHandler();
@@ -110,7 +111,7 @@ public class SubirImagenProductoHandlerTests
 
         // ASSERT: Verificar que el servicio fue invocado exactamente una vez
         _almacenamientoServicioMock.Verify(
-            s => s.GuardarArchivoAsync(It.Is<SubirArchivoRequest>(r => r.Archivo == archivoMock.Object)),
+            s => s.GuardarArchivoAsync(It.Is<ArchivoImagenRequest>(r => r.Archivo == archivoMock.Object)),
             Times.Once);
     }
 }

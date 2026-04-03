@@ -37,7 +37,7 @@ describe('ConsultarProductoPage', () => {
       nombre: 'Mesa',
       descripcion: 'Mesa rectangular de madera',
       categoria: 'Hogar',
-      imagenUrl: 'http://localhost:5261/uploads/mesa.png',
+      imagenUrl: 'http://localhost:5261/imagenes/mesa.png',
       precio: 70,
       stock: 5,
     });

@@ -11,7 +11,8 @@ using Sistema.Inventario.Producto.Aplicacion.DTOs.Requests;
 using Sistema.Inventario.Producto.Aplicacion.DTOs.Responses;
 using Sistema.Inventario.Producto.Dominio.Entidades;
 using Sistema.Inventario.Producto.Infraestructura.Persistencia;
-using Sistema.Inventario.Storage.DTOs;
+using Sistema.Inventario.Storage.DTOs.Requests;
+using Sistema.Inventario.Storage.DTOs.Responses;
 using Sistema.Inventario.Storage.Servicios;
 
 namespace Sistema.Inventario.Producto.Tests.PruebasIntegracion;
@@ -267,15 +268,15 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
     public async Task SubirImagen_CuandoArchivoValido_Retorna200ConImagenUrl()
     {
         // ARRANGE: Configurar mock del servicio de almacenamiento con respuesta exitosa
-        string urlEsperada = "http://localhost:5261/uploads/test-uuid.jpg";
+        string urlEsperada = "http://localhost:5261/imagenes/test-uuid.jpg";
         _almacenamientoServicioMock
-            .Setup(s => s.GuardarArchivoAsync(It.IsAny<SubirArchivoRequest>()))
-            .ReturnsAsync(new ArchivoSubidoResponse
+            .Setup(s => s.GuardarArchivoAsync(It.IsAny<ArchivoImagenRequest>()))
+            .ReturnsAsync(new ArchivoImagenResponse
             {
                 NombreArchivo = "test-uuid.jpg",
-                UrlPublica = urlEsperada,
+                UrlImagen = urlEsperada,
                 TipoContenido = "image/jpeg",
-                TamanoBytes = 1024
+                TamanioBytes = 1024
             });
 
         using HttpClient cliente = _factory.CreateClient();
@@ -305,7 +306,7 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
     {
         // ARRANGE: Configurar mock del servicio para lanzar ArgumentException
         _almacenamientoServicioMock
-            .Setup(s => s.GuardarArchivoAsync(It.IsAny<SubirArchivoRequest>()))
+            .Setup(s => s.GuardarArchivoAsync(It.IsAny<ArchivoImagenRequest>()))
             .ThrowsAsync(new ArgumentException("La extensión del archivo no está permitida. Use jpg, jpeg, png o webp."));
 
         using HttpClient cliente = _factory.CreateClient();

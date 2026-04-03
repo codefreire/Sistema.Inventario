@@ -70,7 +70,7 @@ describe('productoService', () => {
     it('SubirImagen_CuandoArchivoEsValido_DebeRetornarUrlPublica', async () => {
       // ARRANGE: Preparar un archivo valido y una respuesta exitosa del backend
       const archivoTest = new File(['contenido'], 'test.jpg', { type: 'image/jpeg' });
-      const urlEsperada = 'http://localhost:5261/uploads/uuid-123.jpg';
+      const urlEsperada = 'http://localhost:5261/imagenes/uuid-123.jpg';
 
       vi.mocked(apiClient.post).mockResolvedValueOnce({
         data: { imagenUrl: urlEsperada } as SubirImagenResponse,
@@ -96,7 +96,7 @@ describe('productoService', () => {
       const archivoTest = new File(['data'], 'imagen.png', { type: 'image/png' });
 
       vi.mocked(apiClient.post).mockResolvedValueOnce({
-        data: { imagenUrl: 'http://localhost:5261/uploads/test.png' },
+        data: { imagenUrl: 'http://localhost:5261/imagenes/test.png' },
       });
 
       // ACT: Ejecutar la carga de imagen para inspeccionar el payload enviado
@@ -138,7 +138,7 @@ describe('productoService', () => {
         nombre: 'Monitor 27',
         descripcion: 'Monitor para oficina',
         categoria: 'Tecnologia',
-        imagenUrl: 'http://localhost:5261/uploads/uuid-123.jpg',
+        imagenUrl: 'http://localhost:5261/imagenes/uuid-123.jpg',
         precio: 450.00,
         stock: 2,
       };
@@ -173,7 +173,7 @@ describe('productoService', () => {
         nombre: 'Monitor 27 Enhanced',
         descripcion: 'Monitor actualizado',
         categoria: 'Tecnologia',
-        imagenUrl: 'http://localhost:5261/uploads/new-uuid.jpg',
+        imagenUrl: 'http://localhost:5261/imagenes/new-uuid.jpg',
         precio: 500.00,
         stock: 5,
       };

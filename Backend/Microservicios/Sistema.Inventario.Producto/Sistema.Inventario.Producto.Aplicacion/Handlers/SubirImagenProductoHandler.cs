@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Http;
 using Sistema.Inventario.Producto.Aplicacion.DTOs.Responses;
-using Sistema.Inventario.Storage.DTOs;
+using Sistema.Inventario.Storage.DTOs.Requests;
+using Sistema.Inventario.Storage.DTOs.Responses;
+
 using Sistema.Inventario.Storage.Servicios;
 
 namespace Sistema.Inventario.Producto.Aplicacion.Handlers;
@@ -31,14 +33,14 @@ public class SubirImagenProductoHandler
     /// <returns>Respuesta con la URL pública de la imagen.</returns>
     public async Task<SubirImagenResponse> Handle(IFormFile archivo)
     {
-        ArchivoSubidoResponse archivoSubido = await _almacenamientoServicio.GuardarArchivoAsync(new SubirArchivoRequest
+        ArchivoImagenResponse archivoSubido = await _almacenamientoServicio.GuardarArchivoAsync(new ArchivoImagenRequest
         {
             Archivo = archivo
         });
 
         return new SubirImagenResponse
         {
-            ImagenUrl = archivoSubido.UrlPublica
+            ImagenUrl = archivoSubido.UrlImagen
         };
     }
 }

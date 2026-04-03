@@ -168,8 +168,8 @@ ehthumbs.db
 Desktop.ini
 
 # =========================
-# Runtime uploads (Producto)
+# Runtime imagenes (Producto)
 # =========================
 
-Backend/Microservicios/Sistema.Inventario.Producto/wwwroot/uploads/*
-!Backend/Microservicios/Sistema.Inventario.Producto/wwwroot/uploads/.gitkeep
+Backend/Microservicios/Sistema.Inventario.Producto/wwwroot/imagenes/*
+!Backend/Microservicios/Sistema.Inventario.Producto/wwwroot/imagenes/.gitkeep
