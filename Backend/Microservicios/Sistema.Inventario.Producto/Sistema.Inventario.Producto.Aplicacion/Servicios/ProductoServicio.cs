@@ -235,17 +235,7 @@ public class ProductoServicio : IProductoServicio
                 return null;
             }
 
-            ProductoEntidad datosActualizados = new()
-            {
-                Nombre = producto.Nombre,
-                Descripcion = producto.Descripcion,
-                Categoria = producto.Categoria,
-                ImagenUrl = producto.ImagenUrl,
-                Precio = producto.Precio,
-                Stock = nuevoStock
-            };
-
-            ProductoEntidad? productoActualizado = await _productoRepositorio.ActualizarProductoAsync(id, datosActualizados);
+            ProductoEntidad? productoActualizado = await _productoRepositorio.AjustarStockAsync(id, nuevoStock);
             if (productoActualizado is null)
             {
                 return null;

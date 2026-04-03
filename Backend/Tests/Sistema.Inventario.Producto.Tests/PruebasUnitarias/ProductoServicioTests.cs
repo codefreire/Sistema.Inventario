@@ -327,11 +327,19 @@ public class ProductoServicioTests
             .ReturnsAsync(entidadExistente);
 
         _repositorioProductoMock
-            .Setup(repositorio => repositorio.ActualizarProductoAsync(idProducto, It.IsAny<ProductoEntidad>()))
-            .ReturnsAsync((Guid id, ProductoEntidad actualizado) =>
+            .Setup(repositorio => repositorio.AjustarStockAsync(idProducto, 15))
+            .ReturnsAsync((Guid id, int nuevoStock) =>
             {
-                actualizado.Id = id;
-                return actualizado;
+                return new ProductoEntidad
+                {
+                    Id = id,
+                    Nombre = entidadExistente.Nombre,
+                    Descripcion = entidadExistente.Descripcion,
+                    Categoria = entidadExistente.Categoria,
+                    ImagenUrl = entidadExistente.ImagenUrl,
+                    Precio = entidadExistente.Precio,
+                    Stock = nuevoStock
+                };
             });
 
         ProductoServicio servicio = CrearServicio();
@@ -368,11 +376,19 @@ public class ProductoServicioTests
             .ReturnsAsync(entidadExistente);
 
         _repositorioProductoMock
-            .Setup(repositorio => repositorio.ActualizarProductoAsync(idProducto, It.IsAny<ProductoEntidad>()))
-            .ReturnsAsync((Guid id, ProductoEntidad actualizado) =>
+            .Setup(repositorio => repositorio.AjustarStockAsync(idProducto, 7))
+            .ReturnsAsync((Guid id, int nuevoStock) =>
             {
-                actualizado.Id = id;
-                return actualizado;
+                return new ProductoEntidad
+                {
+                    Id = id,
+                    Nombre = entidadExistente.Nombre,
+                    Descripcion = entidadExistente.Descripcion,
+                    Categoria = entidadExistente.Categoria,
+                    ImagenUrl = entidadExistente.ImagenUrl,
+                    Precio = entidadExistente.Precio,
+                    Stock = nuevoStock
+                };
             });
 
         ProductoServicio servicio = CrearServicio();
@@ -405,7 +421,7 @@ public class ProductoServicioTests
 
         // ASSERT: Verificar que retorna null sin llamar al repositorio de actualizacion
         Assert.Null(resultado);
-        _repositorioProductoMock.Verify(repositorio => repositorio.ActualizarProductoAsync(It.IsAny<Guid>(), It.IsAny<ProductoEntidad>()), Times.Never);
+        _repositorioProductoMock.Verify(repositorio => repositorio.AjustarStockAsync(It.IsAny<Guid>(), It.IsAny<int>()), Times.Never);
     }
 
     /// <summary>
@@ -438,6 +454,6 @@ public class ProductoServicioTests
 
         // ASSERT: Verificar que retorna null sin intentar actualizar
         Assert.Null(resultado);
-        _repositorioProductoMock.Verify(repositorio => repositorio.ActualizarProductoAsync(It.IsAny<Guid>(), It.IsAny<ProductoEntidad>()), Times.Never);
+        _repositorioProductoMock.Verify(repositorio => repositorio.AjustarStockAsync(It.IsAny<Guid>(), It.IsAny<int>()), Times.Never);
     }
 }

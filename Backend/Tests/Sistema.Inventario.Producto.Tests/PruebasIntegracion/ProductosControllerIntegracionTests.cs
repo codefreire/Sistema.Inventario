@@ -226,6 +226,54 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
     }
 
     /// <summary>
+    /// Valida que PATCH /api/productos/{id}/stock ajuste correctamente el stock y retorne 200 OK
+    /// </summary>
+    [Fact]
+    public async Task AjustarStock_CuandoCompraValida_Retorna200YActualizaStock()
+    {
+        // ARRANGE: Preparar base limpia y crear un producto inicial con stock conocido
+        await ReiniciarBaseAsync();
+        using HttpClient cliente = _factory.CreateClient();
+
+        CrearProductoRequest productoRequest = new()
+        {
+            Nombre = "Producto Stock",
+            Descripcion = "Producto para prueba de patch",
+            Categoria = "General",
+            ImagenUrl = "https://sistemainventario.com/productos/stock.png",
+            Precio = 50,
+            Stock = 10
+        };
+
+        HttpResponseMessage respuestaCrear = await cliente.PostAsJsonAsync("/api/productos", productoRequest);
+        ProductoResponse? productoCreado = await respuestaCrear.Content.ReadFromJsonAsync<ProductoResponse>();
+
+        Assert.Equal(HttpStatusCode.Created, respuestaCrear.StatusCode);
+        Assert.NotNull(productoCreado);
+
+        AjustarStockRequest request = new()
+        {
+            Cantidad = 3,
+            TipoOperacion = "Compra"
+        };
+
+        // ACT: Ajustar stock con operación de compra
+        HttpResponseMessage respuestaPatch = await cliente.PatchAsJsonAsync($"/api/productos/{productoCreado!.Id}/stock", request);
+
+        // ASSERT: Verificar respuesta 200 y stock incrementado en base de datos
+        Assert.Equal(HttpStatusCode.OK, respuestaPatch.StatusCode);
+
+        using IServiceScope scope = _factory.Services.CreateScope();
+        ProductoDbContext contextoDb = scope.ServiceProvider.GetRequiredService<ProductoDbContext>();
+        ProductoEntidad? productoActualizado = await contextoDb.Productos.FirstOrDefaultAsync(p => p.Id == productoCreado.Id);
+
+        Assert.NotNull(productoActualizado);
+        Assert.Equal(13, productoActualizado!.Stock);
+        Assert.Equal("Producto Stock", productoActualizado.Nombre);
+        Assert.Equal("Producto para prueba de patch", productoActualizado.Descripcion);
+    }
+
+    /// <summary>
     /// Reinicia la base de datos en memoria eliminando e recreando el esquema
     /// </summary>
     private async Task ReiniciarBaseAsync()
@@ -268,6 +316,7 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
     public async Task SubirImagen_CuandoArchivoValido_Retorna200ConImagenUrl()
     {
         // ARRANGE: Configurar mock del servicio de almacenamiento con respuesta exitosa
+        _almacenamientoServicioMock.Reset();
         string urlEsperada = "http://localhost:5261/imagenes/test-uuid.jpg";
         _almacenamientoServicioMock
             .Setup(s => s.GuardarArchivoAsync(It.IsAny<ArchivoImagenRequest>()))
@@ -286,7 +335,7 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
         bytesArchivo.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
 
         using MultipartFormDataContent formulario = new();
-        formulario.Add(bytesArchivo, "archivo", "producto.jpg");
+        formulario.Add(bytesArchivo, "archivoImagen", "producto.jpg");
 
         // ACT: Realizar POST multipart al endpoint de imágenes
         HttpResponseMessage respuesta = await cliente.PostAsync("/api/productos/imagenes", formulario);
@@ -305,6 +354,7 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
     public async Task SubirImagen_CuandoServicioRechazaArchivo_Retorna400()
     {
         // ARRANGE: Configurar mock del servicio para lanzar ArgumentException
+        _almacenamientoServicioMock.Reset();
         _almacenamientoServicioMock
             .Setup(s => s.GuardarArchivoAsync(It.IsAny<ArchivoImagenRequest>()))
             .ThrowsAsync(new ArgumentException("La extensión del archivo no está permitida. Use jpg, jpeg, png o webp."));
@@ -316,7 +366,7 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
         bytesArchivo.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
 
         using MultipartFormDataContent formulario = new();
-        formulario.Add(bytesArchivo, "archivo", "malware.exe");
+        formulario.Add(bytesArchivo, "archivoImagen", "malware.exe");
 
         // ACT: Realizar POST multipart con archivo inválido
         HttpResponseMessage respuesta = await cliente.PostAsync("/api/productos/imagenes", formulario);

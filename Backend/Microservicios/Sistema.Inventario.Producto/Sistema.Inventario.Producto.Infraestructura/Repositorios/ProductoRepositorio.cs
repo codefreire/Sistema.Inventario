@@ -78,6 +78,26 @@ public class ProductoRepositorio : IProductoRepositorio
     }
 
     /// <summary>
+    /// Método para actualizar únicamente el stock de un Producto
+    /// </summary>
+    /// <param name="id">Identificador del Producto</param>
+    /// <param name="nuevoStock">Nuevo valor de stock</param>
+    /// <returns>Producto actualizado o null si no existe</returns>
+    public async Task<ProductoEntidad?> AjustarStockAsync(Guid id, int nuevoStock)
+    {
+        ProductoEntidad? producto = await _contexto.Productos.FirstOrDefaultAsync(producto => producto.Id == id);
+        if (producto is null)
+        {
+            return null;
+        }
+
+        producto.Stock = nuevoStock;
+
+        await _contexto.SaveChangesAsync();
+        return producto;
+    }
+
+    /// <summary>
     /// Método para eliminar un Producto
     /// </summary>
     /// <param name="id">Identificador del Producto</param>

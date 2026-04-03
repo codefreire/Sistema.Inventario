@@ -35,6 +35,14 @@ public interface IProductoRepositorio
     Task<ProductoEntidad?> ActualizarProductoAsync(Guid id, ProductoEntidad productoEntidad);
 
     /// <summary>
+    /// Método para actualizar únicamente el stock de un Producto
+    /// </summary>
+    /// <param name="id">Identificador del Producto</param>
+    /// <param name="nuevoStock">Nuevo valor de stock</param>
+    /// <returns>Producto actualizado o null si no existe</returns>
+    Task<ProductoEntidad?> AjustarStockAsync(Guid id, int nuevoStock);
+
+    /// <summary>
     /// Método para eliminar un Producto
     /// </summary>
     /// <param name="id">Identificador del Producto</param>
