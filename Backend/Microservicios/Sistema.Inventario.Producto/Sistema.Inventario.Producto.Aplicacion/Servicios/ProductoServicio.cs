@@ -3,6 +3,8 @@ using Sistema.Inventario.Producto.Aplicacion.DTOs.Responses;
 using Sistema.Inventario.Producto.Dominio.Entidades;
 using Sistema.Inventario.Producto.Infraestructura.Repositorios;
 
+using Sistema.Inventario.Storage.Servicios;
+
 namespace Sistema.Inventario.Producto.Aplicacion.Servicios;
 
 /// <summary>
@@ -21,14 +23,21 @@ public class ProductoServicio : IProductoServicio
     private readonly ILogger<ProductoServicio> _logger;
 
     /// <summary>
+    /// Servicio de almacenamiento para manejar la eliminación de imágenes
+    /// </summary>
+    private readonly IAlmacenamientoServicio _almacenamientoServicio;
+
+    /// <summary>
     /// Constructor del servicio para manejar la lógica de negocio de Productos
     /// </summary>
     /// <param name="productoRepositorio">Repositorio para acceder a los datos de Productos</param>
     /// <param name="logger">Logging para registrar eventos del servicio</param>
-    public ProductoServicio(IProductoRepositorio productoRepositorio, ILogger<ProductoServicio> logger)
+    /// <param name="almacenamientoServicio">Servicio de almacenamiento para manejar imágenes</param>
+    public ProductoServicio(IProductoRepositorio productoRepositorio, ILogger<ProductoServicio> logger, IAlmacenamientoServicio almacenamientoServicio)
     {
         _productoRepositorio = productoRepositorio;
         _logger = logger;
+        _almacenamientoServicio = almacenamientoServicio;
     }
 
     /// <summary>
@@ -144,6 +153,26 @@ public class ProductoServicio : IProductoServicio
     {
         try
         {
+            ProductoEntidad? productoActual = await _productoRepositorio.ObtenerProductoPorIdAsync(id);
+            if (productoActual is null)
+            {
+                _logger.LogWarning($"No se encontro el producto con Id {id} para actualizar.");
+                return null;
+            }
+
+            if (!string.IsNullOrEmpty(productoActual.ImagenUrl) && productoActual.ImagenUrl != request.ImagenUrl)
+            {
+                bool imagenEliminada = await _almacenamientoServicio.EliminarArchivoAsync(productoActual.ImagenUrl);
+                if (imagenEliminada)
+                {
+                    _logger.LogInformation($"Imagen anterior eliminada del almacenamiento para producto con Id {id}.");
+                }
+                else
+                {
+                    _logger.LogWarning($"No se pudo eliminar la imagen anterior del producto con Id {id}.");
+                }
+            }
+
             ProductoEntidad datosActualizados = new()
             {
                 Nombre = request.Nombre,
@@ -190,6 +219,26 @@ public class ProductoServicio : IProductoServicio
     {
         try
         {
+            ProductoEntidad? producto = await _productoRepositorio.ObtenerProductoPorIdAsync(id);
+            if (producto is null)
+            {
+                _logger.LogWarning($"No se encontro el producto con Id {id} para eliminar.");
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(producto.ImagenUrl))
+            {
+                bool imagenEliminada = await _almacenamientoServicio.EliminarArchivoAsync(producto.ImagenUrl);
+                if (imagenEliminada)
+                {
+                    _logger.LogInformation($"Imagen eliminada del almacenamiento para producto con Id {id}.");
+                }
+                else
+                {
+                    _logger.LogWarning($"No se pudo eliminar la imagen del producto con Id {id}.");
+                }
+            }
+
             bool eliminado = await _productoRepositorio.EliminarProductoAsync(id);
             if (!eliminado)
             {
