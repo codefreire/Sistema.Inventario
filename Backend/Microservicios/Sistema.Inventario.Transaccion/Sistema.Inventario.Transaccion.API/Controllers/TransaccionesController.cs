@@ -88,15 +88,8 @@ public class TransaccionesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<TransaccionResponse>> CrearTransaccion([FromBody] CrearTransaccionRequest request)
     {
-        try
-        {
-            TransaccionResponse transaccion = await _crearTransaccionHandler.Handle(request);
-            return CreatedAtAction(nameof(ObtenerTransaccion), new { id = transaccion.Id }, transaccion);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        TransaccionResponse transaccion = await _crearTransaccionHandler.Handle(request);
+        return CreatedAtAction(nameof(ObtenerTransaccion), new { id = transaccion.Id }, transaccion);
     }
 
     /// <summary>
@@ -108,19 +101,12 @@ public class TransaccionesController : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<TransaccionResponse>> ActualizarTransaccion([FromRoute] ObtenerTransaccionPorIdRequest idRequest, [FromBody] ActualizarTransaccionRequest request)
     {
-        try
+        TransaccionResponse? transaccion = await _actualizarTransaccionHandler.Handle(idRequest.Id, request);
+        if (transaccion is null)
         {
-            TransaccionResponse? transaccion = await _actualizarTransaccionHandler.Handle(idRequest.Id, request);
-            if (transaccion is null)
-            {
-                return NotFound($"No se encontró la transacción con Id {idRequest.Id}.");
-            }
-            return Ok(transaccion);
+            return NotFound($"No se encontró la transacción con Id {idRequest.Id}.");
         }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        return Ok(transaccion);
     }
 
     /// <summary>
