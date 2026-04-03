@@ -63,6 +63,8 @@ app.UseStaticFiles();
 
 app.UseHealthChecks("/health");
 
+app.UseManejoExcepciones();
+
 app.UseTiempoRequest();
 
 app.MapControllers();

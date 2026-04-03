@@ -158,23 +158,23 @@ public class ProductosController : ControllerBase
     }
 
     /// <summary>
-    /// Endpoint para subir una imagen de Producto al almacenamiento local.
-    /// Devuelve la URL pública que puede usarse como <c>imagenUrl</c> al crear o actualizar un Producto.
+    /// Endpoint para subir una imagen de Producto al almacenamiento
+    /// Devuelve la URL que se usa al crear o actualizar un Producto
     /// </summary>
-    /// <param name="archivo">Archivo de imagen (jpg, jpeg, png o webp, máximo 5 MB)</param>
-    /// <returns>URL pública de la imagen almacenada</returns>
+    /// <param name="archivo">Archivo de imagen enviado con el campo <c>archivo</c></param>
+    /// <param name="archivoImagen">Archivo de imagen enviado con el campo <c>archivoImagen</c></param>
+    /// <returns>URL de la imagen almacenada</returns>
     [HttpPost("imagenes")]
     [Consumes("multipart/form-data")]
-    public async Task<ActionResult<SubirImagenResponse>> SubirImagen([FromForm] IFormFile archivo)
+    public async Task<ActionResult<SubirImagenResponse>> SubirImagen([FromForm] IFormFile? archivo, [FromForm] IFormFile? archivoImagen)
     {
-        try
+        IFormFile? archivoSubida = archivoImagen ?? archivo;
+        if (archivoSubida is null)
         {
-            SubirImagenResponse respuesta = await _subirImagenHandler.Handle(archivo);
-            return Ok(respuesta);
+            return BadRequest("Debe enviar un archivo en el campo 'archivo' o 'archivoImagen'.");
         }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+
+        SubirImagenResponse respuesta = await _subirImagenHandler.Handle(archivoSubida);
+        return Ok(respuesta);
     }
 }
