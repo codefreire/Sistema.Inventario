@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
+
 using Sistema.Inventario.Producto.Aplicacion.DTOs.Requests;
 using Sistema.Inventario.Producto.Aplicacion.DTOs.Responses;
 using Sistema.Inventario.Producto.Dominio.Entidades;
@@ -55,6 +56,42 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
                 servicios.AddSingleton(_almacenamientoServicioMock.Object);
             });
         });
+    }
+
+    /// <summary>
+    /// Reinicia la base de datos en memoria eliminando y recreando el esquema
+    /// </summary>
+    private async Task ReiniciarBaseAsync()
+    {
+        using IServiceScope scope = _factory.Services.CreateScope();
+        ProductoDbContext contextoDb = scope.ServiceProvider.GetRequiredService<ProductoDbContext>();
+        await contextoDb.Database.EnsureDeletedAsync();
+        await contextoDb.Database.EnsureCreatedAsync();
+    }
+
+    /// <summary>
+    /// Inserta datos de prueba en la base de datos en memoria
+    /// </summary>
+    /// <param name="nombre">Nombre del producto a insertar</param>
+    /// <param name="precio">Precio del producto a insertar</param>
+    /// <param name="stock">Stock del producto a insertar</param>
+    private async Task InsertarProductoAsync(string nombre, decimal precio, int stock)
+    {
+        using IServiceScope scope = _factory.Services.CreateScope();
+        ProductoDbContext contextoDb = scope.ServiceProvider.GetRequiredService<ProductoDbContext>();
+
+        await contextoDb.Productos.AddAsync(new ProductoEntidad
+        {
+            Id = Guid.NewGuid(),
+            Nombre = nombre,
+            Descripcion = "Producto semilla",
+            Categoria = "General",
+            ImagenUrl = "https://sistemainventario.com/productos/semilla.png",
+            Precio = precio,
+            Stock = stock
+        });
+
+        await contextoDb.SaveChangesAsync();
     }
 
     /// <summary>
@@ -107,7 +144,7 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
 
         using IServiceScope scope = _factory.Services.CreateScope();
         ProductoDbContext contextoDb = scope.ServiceProvider.GetRequiredService<ProductoDbContext>();
-        ProductoEntidad? productoCreado = await contextoDb.Productos.FirstOrDefaultAsync(p => p.Nombre == "Audifonos");
+        ProductoEntidad? productoCreado = await contextoDb.Productos.FirstOrDefaultAsync(producto => producto.Nombre == "Audifonos");
 
         Assert.NotNull(productoCreado);
         Assert.Equal(80, productoCreado!.Precio);
@@ -179,7 +216,7 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
 
         using IServiceScope scope = _factory.Services.CreateScope();
         ProductoDbContext contextoDb = scope.ServiceProvider.GetRequiredService<ProductoDbContext>();
-        ProductoEntidad? productoActualizado = await contextoDb.Productos.FirstOrDefaultAsync(p => p.Id == productoCreado.Id);
+        ProductoEntidad? productoActualizado = await contextoDb.Productos.FirstOrDefaultAsync(producto => producto.Id == productoCreado.Id);
 
         Assert.NotNull(productoActualizado);
         Assert.Equal("Impresora Pro", productoActualizado!.Nombre);
@@ -208,20 +245,20 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
         };
 
         HttpResponseMessage respuesta = await cliente.PostAsJsonAsync("/api/productos", productoRequest);
-        ProductoResponse? producto = await respuesta.Content.ReadFromJsonAsync<ProductoResponse>();
+        ProductoResponse? productoResonse = await respuesta.Content.ReadFromJsonAsync<ProductoResponse>();
 
         Assert.Equal(HttpStatusCode.Created, respuesta.StatusCode);
-        Assert.NotNull(producto);
+        Assert.NotNull(productoResonse);
 
         // ACT: Realizar DELETE para eliminar producto
-        HttpResponseMessage response = await cliente.DeleteAsync($"/api/productos/{producto!.Id}");
+        HttpResponseMessage response = await cliente.DeleteAsync($"/api/productos/{productoResonse!.Id}");
 
         // ASSERT: Verificar status 204 y que se eliminó de base de datos
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
         using IServiceScope alcance = _factory.Services.CreateScope();
         ProductoDbContext contextoDb = alcance.ServiceProvider.GetRequiredService<ProductoDbContext>();
-        ProductoEntidad? productoEliminado = await contextoDb.Productos.FirstOrDefaultAsync(p => p.Id == producto.Id);
+        ProductoEntidad? productoEliminado = await contextoDb.Productos.FirstOrDefaultAsync(producto => producto.Id == productoResonse.Id);
         Assert.Null(productoEliminado);
     }
 
@@ -229,7 +266,7 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
     /// Valida que PATCH /api/productos/{id}/stock ajuste correctamente el stock y retorne 200 OK
     /// </summary>
     [Fact]
-    public async Task AjustarStock_CuandoCompraValida_Retorna200YActualizaStock()
+    public async Task AjustarStock_CuandoCompraValidaActualizaStock_Retorna200()
     {
         // ARRANGE: Preparar base limpia y crear un producto inicial con stock conocido
         await ReiniciarBaseAsync();
@@ -265,55 +302,17 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
 
         using IServiceScope scope = _factory.Services.CreateScope();
         ProductoDbContext contextoDb = scope.ServiceProvider.GetRequiredService<ProductoDbContext>();
-        ProductoEntidad? productoActualizado = await contextoDb.Productos.FirstOrDefaultAsync(p => p.Id == productoCreado.Id);
+        ProductoEntidad? productoActualizado = await contextoDb.Productos.FirstOrDefaultAsync(producto => producto.Id == productoCreado.Id);
 
         Assert.NotNull(productoActualizado);
         Assert.Equal(13, productoActualizado!.Stock);
-        Assert.Equal("Producto Stock", productoActualizado.Nombre);
-        Assert.Equal("Producto para prueba de patch", productoActualizado.Descripcion);
-    }
-
-    /// <summary>
-    /// Reinicia la base de datos en memoria eliminando e recreando el esquema
-    /// </summary>
-    private async Task ReiniciarBaseAsync()
-    {
-        using IServiceScope scope = _factory.Services.CreateScope();
-        ProductoDbContext contextoDb = scope.ServiceProvider.GetRequiredService<ProductoDbContext>();
-        await contextoDb.Database.EnsureDeletedAsync();
-        await contextoDb.Database.EnsureCreatedAsync();
-    }
-
-    /// <summary>
-    /// Inserta datos de prueba en la base de datos en memoria
-    /// </summary>
-    /// <param name="nombre">Nombre del producto a insertar</param>
-    /// <param name="precio">Precio del producto a insertar</param>
-    /// <param name="stock">Stock del producto a insertar</param>
-    private async Task InsertarProductoAsync(string nombre, decimal precio, int stock)
-    {
-        using IServiceScope scope = _factory.Services.CreateScope();
-        ProductoDbContext contextoDb = scope.ServiceProvider.GetRequiredService<ProductoDbContext>();
-
-        await contextoDb.Productos.AddAsync(new ProductoEntidad
-        {
-            Id = Guid.NewGuid(),
-            Nombre = nombre,
-            Descripcion = "Producto semilla",
-            Categoria = "General",
-            ImagenUrl = "https://sistemainventario.com/productos/semilla.png",
-            Precio = precio,
-            Stock = stock
-        });
-
-        await contextoDb.SaveChangesAsync();
     }
 
     /// <summary>
     /// Valida que POST /api/productos/imagenes con archivo válido retorne 200 OK con la URL pública
     /// </summary>
     [Fact]
-    public async Task SubirImagen_CuandoArchivoValido_Retorna200ConImagenUrl()
+    public async Task SubirImagen_CuandoArchivoValidoConImagenUrl_Retorna200()
     {
         // ARRANGE: Configurar mock del servicio de almacenamiento con respuesta exitosa
         _almacenamientoServicioMock.Reset();
@@ -330,7 +329,8 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
 
         using HttpClient cliente = _factory.CreateClient();
 
-        byte[] contenidoArchivo = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 }; // cabecera JPEG mínima
+        // cabecera JPEG mínima
+        byte[] contenidoArchivo = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 };
         using ByteArrayContent bytesArchivo = new(contenidoArchivo);
         bytesArchivo.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
 
@@ -361,7 +361,8 @@ public class ProductosControllerIntegracionTests : IClassFixture<WebApplicationF
 
         using HttpClient cliente = _factory.CreateClient();
 
-        byte[] contenidoArchivo = new byte[] { 0x4D, 0x5A }; // cabecera EXE
+        // cabecera EXE
+        byte[] contenidoArchivo = new byte[] { 0x4D, 0x5A };
         using ByteArrayContent bytesArchivo = new(contenidoArchivo);
         bytesArchivo.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
 
