@@ -112,7 +112,9 @@ Notas de arquitectura:
     - Arquitectura limpia por capas: API, Aplicación, Dominio, Infraestructura.
     - CRUD de productos, ajuste de stock y endpoint multipart para imágenes.
     - Static files habilitados para servir imágenes subidas.
-    - FluentValidation, health check, middleware de tiempo de request.
+    - FluentValidation, health check.
+    - `ManejoExcepcionesMiddleware`: intercepta `ArgumentException` en el pipeline y responde con `400 Bad Request` con el mensaje de error, evitando que lleguen excepciones no manejadas al cliente.
+    - `TiempoRequestMiddleware`: mide con `Stopwatch` la duración de cada request y registra `HTTP {método} {ruta} => {status} en {ms} ms` vía Serilog.
     - Logging con Serilog en `logs/log-.txt`.
 
 4. `Backend/Microservicios/Sistema.Inventario.Transaccion`
@@ -120,7 +122,9 @@ Notas de arquitectura:
     - Arquitectura limpia por capas: API, Aplicación, Dominio, Infraestructura.
     - CRUD de transacciones con reglas de negocio de compra/venta.
     - Validación de stock y ajuste de stock en Productos vía HttpClient síncrono.
-    - FluentValidation, health check, middleware de tiempo de request.
+    - FluentValidation, health check.
+    - `ManejoExcepcionesMiddleware`: intercepta `ArgumentException` en el pipeline y responde con `400 Bad Request` con el mensaje de error, evitando que lleguen excepciones no manejadas al cliente.
+    - `TiempoRequestMiddleware`: mide con `Stopwatch` la duración de cada request y registra `HTTP {método} {ruta} => {status} en {ms} ms` vía Serilog.
     - Logging con Serilog en `logs/log-.txt`.
 
 5. `Backend/Tests/Sistema.Inventario.Producto.Tests` y `Backend/Tests/Sistema.Inventario.Transaccion.Tests`
@@ -151,7 +155,8 @@ Notas de arquitectura:
 9. Documentación de APIs con Swagger en Productos, Transacciones y Gateway.
 10. Validaciones y manejo de excepciones:
     - Backend: FluentValidation en capa Aplicación, validación de tipos/propiedades y reglas de negocio.
-    - Backend: Middleware de captura de excepciones globales registrando con Serilog.
+    - Backend: `ManejoExcepcionesMiddleware` — captura `ArgumentException` lanzadas por la capa de dominio/almacenamiento, registra con Serilog (`LogWarning`) y responde `400 Bad Request` con el mensaje de error como texto plano.
+    - Backend: `TiempoRequestMiddleware` — registra con Serilog (`LogInformation`) el método HTTP, la ruta, el status code y la duración en milisegundos de cada request.
     - Frontend: Validación de formularios con feedback al usuario vía componentes de notificación.
     - Frontend: Manejo de errores HTTP y timouts con mensajes claros en interfaz.
 

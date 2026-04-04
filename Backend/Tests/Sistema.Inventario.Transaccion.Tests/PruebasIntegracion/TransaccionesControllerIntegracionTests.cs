@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
+
 using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Externos;
 using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Requests;
 using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Responses;
@@ -56,6 +57,44 @@ public class TransaccionesControllerIntegracionTests : IClassFixture<WebApplicat
                 servicios.AddScoped<IProductoApiCliente>(_ => productoApiClienteMock.Object);
             });
         });
+    }
+
+    /// <summary>
+    /// Reinicia la base InMemory de transacciones para garantizar independencia entre pruebas
+    /// </summary>
+    private async Task ReiniciarBaseAsync()
+    {
+        using IServiceScope scope = _factory.Services.CreateScope();
+        TransaccionDbContext contextoDb = scope.ServiceProvider.GetRequiredService<TransaccionDbContext>();
+        await contextoDb.Database.EnsureDeletedAsync();
+        await contextoDb.Database.EnsureCreatedAsync();
+    }
+
+    /// <summary>
+    /// Inserta una transacción de prueba en la base InMemory
+    /// </summary>
+    /// <param name="tipoTransaccion">Tipo de la transacción (e.g., "Venta")</param>
+    /// <param name="cantidad">Cantidad de productos en la transacción</param>
+    /// <param name="precioUnitario">Precio unitario de cada producto</param>
+    /// <param name="detalle">Detalle de la transacción</param>
+    private async Task InsertarTransaccionAsync(string tipoTransaccion, int cantidad, decimal precioUnitario, string detalle)
+    {
+        using IServiceScope scope = _factory.Services.CreateScope();
+        TransaccionDbContext contextoDb = scope.ServiceProvider.GetRequiredService<TransaccionDbContext>();
+
+        await contextoDb.Transacciones.AddAsync(new TransaccionEntidad
+        {
+            Id = Guid.NewGuid(),
+            Fecha = new DateTime(2026, 3, 25, 8, 0, 0),
+            TipoTransaccion = tipoTransaccion,
+            ProductoId = Guid.NewGuid(),
+            Cantidad = cantidad,
+            PrecioUnitario = precioUnitario,
+            PrecioTotal = cantidad * precioUnitario,
+            Detalle = detalle
+        });
+
+        await contextoDb.SaveChangesAsync();
     }
 
     /// <summary>
@@ -165,10 +204,10 @@ public class TransaccionesControllerIntegracionTests : IClassFixture<WebApplicat
             Detalle = "Transacción actualizada"
         };
 
-        // ACT: Ejecutar actualización HTTP de la transacción.
+        // ACT: Ejecutar actualización HTTP de la transacción
         HttpResponseMessage response = await cliente.PutAsJsonAsync($"/api/transacciones/{transaccion.Id}", request);
 
-        // ASSERT: Verificar respuesta correcta y persistencia de cambios.
+        // ASSERT: Verificar respuesta correcta y persistencia de cambios
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         using IServiceScope scope = _factory.Services.CreateScope();
@@ -315,43 +354,5 @@ public class TransaccionesControllerIntegracionTests : IClassFixture<WebApplicat
 
         // ASSERT: Verificar respuesta 404 NotFound
         Assert.Equal(HttpStatusCode.NotFound, respuesta.StatusCode);
-    }
-
-    /// <summary>
-    /// Reinicia la base InMemory de transacciones para garantizar independencia entre pruebas
-    /// </summary>
-    private async Task ReiniciarBaseAsync()
-    {
-        using IServiceScope scope = _factory.Services.CreateScope();
-        TransaccionDbContext contextoDb = scope.ServiceProvider.GetRequiredService<TransaccionDbContext>();
-        await contextoDb.Database.EnsureDeletedAsync();
-        await contextoDb.Database.EnsureCreatedAsync();
-    }
-
-    /// <summary>
-    /// Inserta una transacción de prueba en la base InMemory
-    /// </summary>
-    /// <param name="tipoTransaccion">Tipo de la transacción (e.g., "Venta")</param>
-    /// <param name="cantidad">Cantidad de productos en la transacción</param>
-    /// <param name="precioUnitario">Precio unitario de cada producto</param>
-    /// <param name="detalle">Detalle de la transacción</param>
-    private async Task InsertarTransaccionAsync(string tipoTransaccion, int cantidad, decimal precioUnitario, string detalle)
-    {
-        using IServiceScope scope = _factory.Services.CreateScope();
-        TransaccionDbContext contextoDb = scope.ServiceProvider.GetRequiredService<TransaccionDbContext>();
-
-        await contextoDb.Transacciones.AddAsync(new TransaccionEntidad
-        {
-            Id = Guid.NewGuid(),
-            Fecha = new DateTime(2026, 3, 25, 8, 0, 0),
-            TipoTransaccion = tipoTransaccion,
-            ProductoId = Guid.NewGuid(),
-            Cantidad = cantidad,
-            PrecioUnitario = precioUnitario,
-            PrecioTotal = cantidad * precioUnitario,
-            Detalle = detalle
-        });
-
-        await contextoDb.SaveChangesAsync();
     }
 }
