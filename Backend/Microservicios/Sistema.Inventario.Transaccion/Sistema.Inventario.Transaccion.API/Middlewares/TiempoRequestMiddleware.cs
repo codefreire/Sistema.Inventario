@@ -2,7 +2,6 @@ using System.Diagnostics;
 
 namespace Sistema.Inventario.Transaccion.API.Middlewares;
 
-
 /// <summary>
 /// Middleware para medir y registrar el tiempo de procesamiento de cada request HTTP
 /// </summary>
@@ -14,7 +13,7 @@ public class TiempoRequestMiddleware
     private readonly RequestDelegate _next;
 
     /// <summary>
-    /// Servicio de logging para registrar la duracion de cada request
+    /// Servicio de logging para registrar la duración de cada request
     /// </summary>
     private readonly ILogger<TiempoRequestMiddleware> _logger;
 
@@ -50,8 +49,8 @@ public static class TiempoRequestMiddlewareExtensions
     /// <summary>
     /// Agrega el middleware de tiempo de request al pipeline HTTP
     /// </summary>
-    /// <param name="appBuilder">Aplicacion HTTP</param>
-    /// <returns>Builder de la aplicacion</returns>
+    /// <param name="appBuilder">Aplicación HTTP</param>
+    /// <returns>Builder de la aplicación</returns>
     public static IApplicationBuilder UseTiempoRequest(this IApplicationBuilder appBuilder)
     {
         return appBuilder.UseMiddleware<TiempoRequestMiddleware>();

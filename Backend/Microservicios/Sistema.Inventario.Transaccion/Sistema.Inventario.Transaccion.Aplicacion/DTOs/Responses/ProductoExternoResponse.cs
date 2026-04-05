@@ -1,7 +1,7 @@
-namespace Sistema.Inventario.Transaccion.Aplicacion.DTOs.Externos;
+namespace Sistema.Inventario.Transaccion.Aplicacion.DTOs.Responses;
 
 /// <summary>
-/// Clase que representa la respuesta del microservicio de Productos (comunicación entre microservicios)
+/// Clase que representa la respuesta del microservicio de Productos
 /// </summary>
 public class ProductoExternoResponse
 {

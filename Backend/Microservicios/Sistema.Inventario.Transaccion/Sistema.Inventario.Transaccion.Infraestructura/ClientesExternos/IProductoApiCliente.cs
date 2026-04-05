@@ -1,4 +1,4 @@
-using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Externos;
+using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Responses;
 
 namespace Sistema.Inventario.Transaccion.Infraestructura.ClientesExternos;
 

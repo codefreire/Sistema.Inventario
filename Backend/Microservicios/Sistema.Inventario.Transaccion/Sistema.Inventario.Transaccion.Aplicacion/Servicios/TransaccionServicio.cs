@@ -1,4 +1,3 @@
-using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Externos;
 using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Requests;
 using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Responses;
 using Sistema.Inventario.Transaccion.Dominio.Entidades;
@@ -112,14 +111,12 @@ public class TransaccionServicio : ITransaccionServicio
     {
         try
         {
-            // Comunicación síncrona: obtener producto desde el microservicio de Productos
             ProductoExternoResponse? producto = await _productoApiCliente.ObtenerProductoPorIdAsync(request.ProductoId);
             if (producto is null)
             {
                 throw new InvalidOperationException($"El producto con Id {request.ProductoId} no existe en el sistema.");
             }
 
-            // Validación de stock: si es una venta, verificar que haya stock suficiente
             if (request.TipoTransaccion.Equals("Venta", StringComparison.OrdinalIgnoreCase) && producto.Stock < request.Cantidad)
             {
                 throw new InvalidOperationException($"Stock insuficiente para el producto '{producto.Nombre}'. Stock disponible: {producto.Stock}, cantidad solicitada: {request.Cantidad}.");
@@ -139,7 +136,6 @@ public class TransaccionServicio : ITransaccionServicio
 
             await _transaccionRepositorio.CrearTransaccionAsync(transaccion);
 
-            // Ajuste de stock: comunicación síncrona con el microservicio de Productos
             bool stockAjustado = await _productoApiCliente.AjustarStockAsync(request.ProductoId, request.Cantidad, request.TipoTransaccion);
             if (!stockAjustado)
             {
@@ -181,7 +177,6 @@ public class TransaccionServicio : ITransaccionServicio
     {
         try
         {
-            // Obtener la transacción actual para revertir el efecto en stock
             TransaccionEntidad? transaccionActual = await _transaccionRepositorio.ObtenerTransaccionPorIdAsync(id);
             if (transaccionActual is null)
             {
@@ -189,24 +184,19 @@ public class TransaccionServicio : ITransaccionServicio
                 return null;
             }
 
-            // Validar que el producto nuevo existe
             ProductoExternoResponse? producto = await _productoApiCliente.ObtenerProductoPorIdAsync(request.ProductoId);
             if (producto is null)
             {
                 throw new InvalidOperationException($"El producto con Id {request.ProductoId} no existe en el sistema.");
             }
 
-            // Revertir el efecto de la transacción anterior en el stock
             string tipoReversion = transaccionActual.TipoTransaccion.Equals("Compra", StringComparison.OrdinalIgnoreCase) ? "Venta" : "Compra";
             await _productoApiCliente.AjustarStockAsync(transaccionActual.ProductoId, transaccionActual.Cantidad, tipoReversion);
 
-            // Obtener el stock actualizado después de la reversión
             ProductoExternoResponse? productoActualizado = await _productoApiCliente.ObtenerProductoPorIdAsync(request.ProductoId);
 
-            // Validar stock si la nueva transacción es una venta
             if (request.TipoTransaccion.Equals("Venta", StringComparison.OrdinalIgnoreCase) && productoActualizado != null && productoActualizado.Stock < request.Cantidad)
             {
-                // Restaurar el stock original
                 await _productoApiCliente.AjustarStockAsync(transaccionActual.ProductoId, transaccionActual.Cantidad, transaccionActual.TipoTransaccion);
                 throw new InvalidOperationException($"Stock insuficiente para el producto '{producto.Nombre}'. Stock disponible: {productoActualizado.Stock}, cantidad solicitada: {request.Cantidad}.");
             }
@@ -228,7 +218,6 @@ public class TransaccionServicio : ITransaccionServicio
                 return null;
             }
 
-            // Aplicar el efecto de la nueva transacción en el stock
             await _productoApiCliente.AjustarStockAsync(request.ProductoId, request.Cantidad, request.TipoTransaccion);
 
             _logger.LogInformation($"Transacción con Id {id} actualizada correctamente.");
@@ -265,7 +254,6 @@ public class TransaccionServicio : ITransaccionServicio
     {
         try
         {
-            // Obtener la transacción antes de eliminar para revertir el efecto en stock
             TransaccionEntidad? transaccion = await _transaccionRepositorio.ObtenerTransaccionPorIdAsync(id);
             if (transaccion is null)
             {
@@ -280,7 +268,6 @@ public class TransaccionServicio : ITransaccionServicio
                 return false;
             }
 
-            // Revertir el efecto en el stock: si fue Compra, decrementar; si fue Venta, incrementar
             string tipoReversion = transaccion.TipoTransaccion.Equals("Compra", StringComparison.OrdinalIgnoreCase) ? "Venta" : "Compra";
             await _productoApiCliente.AjustarStockAsync(transaccion.ProductoId, transaccion.Cantidad, tipoReversion);
 

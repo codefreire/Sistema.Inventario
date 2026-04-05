@@ -25,11 +25,14 @@ public static class ExtensionesServicios
     /// <returns>Colección de servicios</returns>
     public static IServiceCollection AddTransacciones(this IServiceCollection servicios, IConfiguration configuracion)
     {
+        // Agregar servicios de Health Checks para el microservicio de Transacciones
         servicios.AddHealthChecks();
 
+        // Agrega DbContext para el microservicio de Transacciones
         servicios.AddDbContext<TransaccionDbContext>(opciones =>
             opciones.UseSqlServer(configuracion.GetConnectionString("cnInventarioTransaccionesBD")));
 
+        // Agrega Swagger para la documentación de la API
         servicios.AddSwaggerGen(opciones =>
         {
             opciones.SwaggerDoc("v1", new OpenApiInfo
@@ -49,10 +52,7 @@ public static class ExtensionesServicios
             opciones.IncludeXmlComments(xmlPath);
         });
 
-        servicios.AddScoped<ITransaccionRepositorio, TransaccionRepositorio>();
-        servicios.AddScoped<ITransaccionServicio, TransaccionServicio>();
-
-        // Comunicación síncrona con el microservicio de Productos via HttpClient
+        // Comunicación con el microservicio de Productos via HttpClient
         servicios.AddHttpClient<IProductoApiCliente, ProductoApiCliente>(cliente =>
         {
             string productoApiUrl = configuracion["MicroserviciosUrls:ProductoApi"]
@@ -60,12 +60,16 @@ public static class ExtensionesServicios
             cliente.BaseAddress = new Uri(productoApiUrl);
         });
 
+        // Registrar repositorios, servicios y handlers del microservicio de Transacciones
+        servicios.AddScoped<ITransaccionRepositorio, TransaccionRepositorio>();
+        servicios.AddScoped<ITransaccionServicio, TransaccionServicio>();
         servicios.AddScoped<ObtenerTransaccionesHandler>();
         servicios.AddScoped<ObtenerTransaccionHandler>();
         servicios.AddScoped<CrearTransaccionHandler>();
         servicios.AddScoped<ActualizarTransaccionHandler>();
         servicios.AddScoped<EliminarTransaccionHandler>();
 
+        // Configurar FluentValidation para validar las solicitudes de la API
         servicios.AddFluentValidationAutoValidation();
         servicios.AddValidatorsFromAssemblyContaining<ObtenerTransaccionPorIdValidator>();
         servicios.AddValidatorsFromAssemblyContaining<CrearTransaccionValidator>();

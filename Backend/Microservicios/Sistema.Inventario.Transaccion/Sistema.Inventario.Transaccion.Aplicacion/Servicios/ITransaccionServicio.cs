@@ -1,7 +1,7 @@
-namespace Sistema.Inventario.Transaccion.Aplicacion.Servicios;
-
 using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Requests;
 using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Responses;
+
+namespace Sistema.Inventario.Transaccion.Aplicacion.Servicios;
 
 /// <summary>
 /// Interface de servicio para manejar la lógica de negocio de Transacciones

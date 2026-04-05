@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Requests;
 using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Responses;
 using Sistema.Inventario.Transaccion.Aplicacion.Handlers;
+
 namespace Sistema.Inventario.Transaccion.API.Controllers;
 
 /// <summary>

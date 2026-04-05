@@ -4,6 +4,7 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configuración de Serilog
 Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
 builder.Logging.AddSerilog(Log.Logger, dispose: true);
 

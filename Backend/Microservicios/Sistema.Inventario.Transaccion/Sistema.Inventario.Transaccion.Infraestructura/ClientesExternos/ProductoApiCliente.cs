@@ -1,5 +1,5 @@
-using System.Net.Http.Json;
-using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Externos;
+using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Responses;
+using Sistema.Inventario.Transaccion.Aplicacion.DTOs.Requests;
 
 namespace Sistema.Inventario.Transaccion.Infraestructura.ClientesExternos;
 
@@ -8,15 +8,6 @@ namespace Sistema.Inventario.Transaccion.Infraestructura.ClientesExternos;
 /// </summary>
 public class ProductoApiCliente : IProductoApiCliente
 {
-    /// <summary>
-    /// DTO interno para el payload de ajuste de stock.
-    /// </summary>
-    private sealed class AjustarStockRequest
-    {
-        public int Cantidad { get; init; }
-        public string TipoOperacion { get; init; } = string.Empty;
-    }
-
     /// <summary>
     /// Cliente HTTP para realizar las solicitudes al microservicio de Productos
     /// </summary>
