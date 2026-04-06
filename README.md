@@ -202,6 +202,45 @@ Paso Adicional (cambiar el valor de `Server=` en las cadenas de conexión):
 
 > **Nota:** Verificar que el connection string en los archivos `appsettings.json` de cada microservicio apunte a su instancia de SQL Server. Por defecto usa autenticación integrada de Windows sin usuario ni contraseña.
 
+### Alternativa: creación de BD con migraciones EF Core
+
+Si prefieres no ejecutar el script SQL, puedes crear/actualizar las bases desde EF Core con migraciones.
+
+Paso previo:
+
+1. Cambiar el valor de `Server=` en los connection strings de:
+    - `Backend/Microservicios/Sistema.Inventario.Producto/appsettings.json`
+    - `Backend/Microservicios/Sistema.Inventario.Transaccion/appsettings.json`
+2. Usar el valor obtenido con:
+
+```sql
+SELECT @@SERVERNAME AS 'SERVERNAME'
+```
+
+Comando:
+
+```bash
+dotnet tool install --global dotnet-ef
+```
+
+Ejemplo de ejecución por microservicio:
+
+### Migraciones - Producto
+
+```bash
+cd Backend/Microservicios/Sistema.Inventario.Producto
+dotnet ef database update
+```
+
+### Migraciones - Transacción
+
+```bash
+cd Backend/Microservicios/Sistema.Inventario.Transaccion
+dotnet ef database update
+```
+
+> **Nota:** Ejecutar `dotnet ef database update` dentro de cada microservicio que tenga `DbContext` y migraciones para crear su base correspondiente (Productos y Transacciones).
+
 ---
 
 ## Ejecución del Backend
