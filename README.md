@@ -17,9 +17,12 @@ Aplicación web para la gestión de inventarios construida con arquitectura de m
 | .NET SDK | 10.0 |
 | Node.js | 18.x |
 | npm | 9.x |
+| Visual Studio Code | Última |
 | SQL Server (MSSQLSERVER) | 2019 o superior |
 | SQL Server Management Studio (SSMS) o Azure Data Studio | Última |
 | Git | 2.x |
+
+**Recomendación:** Levantar y ejecutar esta solución desde Visual Studio Code para trabajar los microservicios, el gateway, el frontend y las pruebas en terminales separadas dentro del mismo workspace.
 
 ### Puertos de la solución
 
@@ -68,22 +71,9 @@ VITE_API_BASE_URL=http://localhost:7000/api
 
 ## Arquitectura Final
 
-```text
-Frontend (React + TS + Vite :5173)
-    |
-    v
-API Gateway (Ocelot :7000)
-     |-------------------------------> Microservicio Productos (.NET :5261)
-     |                                 - Clean Architecture
-     |                                 - CRUD Productos + carga de imágenes
-     |                                 - DB: InventarioProductosBD
-     |
-     |-------------------------------> Microservicio Transacciones (.NET :5253)
-                                                  - Clean Architecture
-                                                  - CRUD Transacciones + reglas de stock
-                                                  - Cliente HTTP síncrono a Productos
-                                                  - DB: InventarioTransaccionesBD
-```
+<p align="center">
+    <img src="ImagenesEvidencias/arquitectura.png" alt="Arquitectura Final" width="980" />
+</p>
 
 Notas de arquitectura:
 
@@ -170,10 +160,15 @@ El script de creación está en la raíz del repositorio:
 
 Pasos sugeridos (SSMS):
 
-1. Abrir SQL Server Management Studio.
-2. Conectarse a la instancia `MSSQLSERVER` (o la instancia local que uses).
+1. Abrir SQL Server Mangement Studio.
+2. Conectarse a su instancia local de SQL Server.
 3. Abrir el archivo `script_creacion_dbs_y_tablas.sql`.
 4. Ejecutar el script completo.
+5. Ejecutar la siguiente consulta para obtener el nombre del Server:
+
+```sql
+SELECT @@SERVERNAME AS 'SERVERNAME'
+```
 
 El script crea (si no existen):
 
@@ -187,7 +182,13 @@ Importante:
    - `Backend/Microservicios/Sistema.Inventario.Producto/appsettings.json`
    - `Backend/Microservicios/Sistema.Inventario.Transaccion/appsettings.json`
 
-> **Nota:** Verificar que el connection string en los archivos `appsettings.json` de cada microservicio apunte a su instancia de SQL Server. Por defecto usan `Server=LAPTOP-2MO9QJ8P` con autenticación integrada de Windows.
+Paso Adicional (cambiar el valor de `Server=` en las cadenas de conexión):
+
+1. Tomar el valor devuelto por la consulta a `@@SERVERNAME` y reemplazarlo en el valor de `Server=` para las cadenas de conexión ubicados en:
+    - `Backend/Microservicios/Sistema.Inventario.Producto/appsettings.json`
+    - `Backend/Microservicios/Sistema.Inventario.Transaccion/appsettings.json`
+
+> **Nota:** Verificar que el connection string en los archivos `appsettings.json` de cada microservicio apunte a su instancia de SQL Server. Por defecto usa autenticación integrada de Windows sin usuario ni contraseña.
 
 ---
 
@@ -239,6 +240,8 @@ Rutas principales a través del gateway:
 1. `http://localhost:7000/api/productos/*`
 2. `http://localhost:7000/api/transacciones/*`
 
+> **Nota:** Los puertos o URLs de salida también pueden consultarse en la carpeta `Properties` de cada proyecto backend, dentro del archivo `launchSettings.json`, en la propiedad `applicationUrl`.
+
 ---
 
 ## Ejecución del Frontend
@@ -254,6 +257,8 @@ npm run dev
 Aplicación disponible en:
 
 - `http://localhost:5173`
+
+> **Nota:** En backend, los puertos configurados pueden revisarse también en `launchSettings.json`; en frontend, Vite mostrará la URL exacta en la terminal al ejecutar `npm run dev`.
 
 ---
 
