@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+
 using Sistema.Inventario.Producto.Dominio.Entidades;
 
 namespace Sistema.Inventario.Producto.Infraestructura.Persistencia;

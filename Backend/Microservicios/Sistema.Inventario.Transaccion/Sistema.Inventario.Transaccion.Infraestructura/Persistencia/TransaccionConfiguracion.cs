@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 using Sistema.Inventario.Transaccion.Dominio.Entidades;
 
 namespace Sistema.Inventario.Transaccion.Infraestructura.Persistencia;

@@ -3,6 +3,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
+
 using Sistema.Inventario.Producto.Aplicacion.Handlers;
 using Sistema.Inventario.Producto.Aplicacion.Servicios;
 using Sistema.Inventario.Producto.Aplicacion.Validators;

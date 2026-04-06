@@ -1,6 +1,7 @@
+using Serilog;
+
 using Sistema.Inventario.Producto.API.Extensiones;
 using Sistema.Inventario.Producto.API.Middlewares;
-using Serilog;
 
 // Resolver la ruta del proyecto para configurar correctamente el ContentRootPath y WebRootPath para el almacenamiento de archivos imagen
 static string ResolverRutaProyectoProducto()

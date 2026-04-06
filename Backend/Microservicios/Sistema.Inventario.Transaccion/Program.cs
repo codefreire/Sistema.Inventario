@@ -1,6 +1,7 @@
+using Serilog;
+
 using Sistema.Inventario.Transaccion.API.Extensiones;
 using Sistema.Inventario.Transaccion.API.Middlewares;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 

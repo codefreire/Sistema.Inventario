@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+
 using Sistema.Inventario.Storage.Dominio;
 using Sistema.Inventario.Storage.DTOs.Requests;
 using Sistema.Inventario.Storage.DTOs.Responses;

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+
 using Sistema.Inventario.Transaccion.Infraestructura.Persistencia;
 using Sistema.Inventario.Transaccion.Dominio.Entidades;
 

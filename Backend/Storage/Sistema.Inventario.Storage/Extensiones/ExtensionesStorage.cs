@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+
 using Sistema.Inventario.Storage.Servicios;
 
 namespace Sistema.Inventario.Storage.Extensiones;
