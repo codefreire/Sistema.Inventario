@@ -57,6 +57,7 @@ VITE_API_BASE_URL=http://localhost:7000/api
 | `MMLib.SwaggerForOcelot` | Backend/Gateway | Swagger unificado del Gateway. |
 | `Serilog.AspNetCore` + `Serilog.Settings.Configuration` + `Serilog.Sinks.File` | Backend (Gateway + Microservicios) | Logging estructurado en `logs/log-.txt`. |
 | `FluentValidation.AspNetCore` | Backend (Productos/Transacciones) | Validación de requests en capa Aplicación. |
+| `Microsoft.Extensions.Http.Polly` + `Polly` + `Polly.Extensions.Http` | Backend (Transacciones) | Resiliencia HTTP en llamadas a Productos (`Timeout`, `Retry`, `Circuit Breaker`, `Fallback`). |
 | `Microsoft.EntityFrameworkCore.SqlServer` | Backend (Productos/Transacciones) | Persistencia en SQL Server. |
 | `Swashbuckle.AspNetCore.*` | Backend (Productos/Transacciones) | Documentación Swagger/OpenAPI por microservicio. |
 | `axios` | Frontend | Cliente HTTP para consumo de APIs (`apiClient`). |
@@ -112,6 +113,7 @@ Notas de arquitectura:
     - Arquitectura limpia por capas: API, Aplicación, Dominio, Infraestructura.
     - CRUD de transacciones con reglas de negocio de compra/venta.
     - Validación de stock y ajuste de stock en Productos vía HttpClient síncrono.
+    - Patrones de resiliencia en llamadas HTTP a Productos: `Timeout` por request, `Retry` con backoff exponencial (incluye 429), `Circuit Breaker`, `Fallback` controlado en lecturas (`GET`) y logging estructurado de eventos de resiliencia.
     - FluentValidation, health check.
     - `ManejoExcepcionesMiddleware`: (Middleware Personalizado) intercepta `ArgumentException` en el pipeline y responde con `400 Bad Request` con el mensaje de error, evitando que lleguen excepciones no manejadas al cliente.
     - `TiempoRequestMiddleware`: (Middleware Personalizado) mide con `Stopwatch` la duración de cada request y registra `HTTP {método} {ruta} => {status} en {ms} ms` vía Serilog.
@@ -127,6 +129,7 @@ Notas de arquitectura:
 6. `Frontend/Sistema.Inventario.App`
     - Feature-Based Architecture (`features/productos`, `features/transacciones`).
     - Ruteo centralizado y componentes compartidos en `shared`.
+    - Fallback de imágenes en vistas de productos para mostrar imagen de respaldo cuando la URL falla o no existe.
     - Pruebas unitarias e integración con Vitest + Testing Library.
     - Cobertura HTML en `coverage/index.html`.
 
@@ -150,6 +153,15 @@ Notas de arquitectura:
     - Frontend: Validación de formularios con feedback al usuario vía componentes de notificación.
     - Frontend: Manejo de errores HTTP y timouts con mensajes claros en interfaz.
 
+### Resiliencia en Transacciones
+
+El microservicio de Transacciones aplica resiliencia en su comunicación HTTP con Productos para mejorar estabilidad ante fallos temporales:
+
+1. `Timeout` por request de `10` segundos en `HttpClient` tipado.
+2. `Retry` con backoff exponencial (`2s`, `4s`, `8s`) para errores transitorios, `timeout` y `429 TooManyRequests`.
+3. `Circuit Breaker` (abre tras `5` fallos transitorios y se mantiene `30` segundos).
+4. `Fallback` controlado para operaciones de lectura (`GET`) cuando se agotan las políticas transitorias.
+5. Logging estructurado de eventos de resiliencia (`retry`, `break`, `half-open`, `reset`, `fallback`).
 ---
 
 ## Creación de Base de Datos en MSSQLSERVER

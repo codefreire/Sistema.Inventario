@@ -3,6 +3,8 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
+using Polly;
+
 using Sistema.Inventario.Transaccion.Aplicacion.Handlers;
 using Sistema.Inventario.Transaccion.Aplicacion.Servicios;
 using Sistema.Inventario.Transaccion.Aplicacion.Validators;
@@ -52,13 +54,22 @@ public static class ExtensionesServicios
             opciones.IncludeXmlComments(xmlPath);
         });
 
-        // Comunicación con el microservicio de Productos via HttpClient
+        // Comunicación con el microservicio de Productos via HttpClient con políticas de resiliencia Timeout, Retry, Fallback y Circuit Breaker usando Polly
         servicios.AddHttpClient<IProductoApiCliente, ProductoApiCliente>(cliente =>
         {
             string productoApiUrl = configuracion["MicroserviciosUrls:ProductoApi"]
                 ?? "http://localhost:5261";
             cliente.BaseAddress = new Uri(productoApiUrl);
-        });
+            cliente.Timeout = TimeSpan.FromSeconds(10);
+        })
+        .AddPolicyHandler((serviceProvider, request) =>
+            request.Method == HttpMethod.Get
+                ? PoliticasResilienciaHttp.ObtenerPoliticaFallbackLectura(serviceProvider.GetRequiredService<ILogger<ProductoApiCliente>>())
+                : Policy.NoOpAsync<HttpResponseMessage>())
+        .AddPolicyHandler((serviceProvider, _) =>
+            PoliticasResilienciaHttp.ObtenerPoliticaRetry(serviceProvider.GetRequiredService<ILogger<ProductoApiCliente>>()))
+        .AddPolicyHandler((serviceProvider, _) =>
+            PoliticasResilienciaHttp.ObtenerPoliticaCircuitBreaker(serviceProvider.GetRequiredService<ILogger<ProductoApiCliente>>()));
 
         // Registrar repositorios, servicios y handlers del microservicio de Transacciones
         servicios.AddScoped<ITransaccionRepositorio, TransaccionRepositorio>();
