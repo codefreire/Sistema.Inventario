@@ -1,6 +1,8 @@
 # Sistema de Inventario
+Autor: Carlos Freire
+<br>Email: cestebanfreire@hotmail.com
 
-Aplicación web para la gestión de inventarios construida con arquitectura de microservicios.
+Aplicación web para la gestión de inventarios construida con las siguientes arquitecturas: el Frontend con `feature based architecture` y el Backend con `microservicios clean architecture`.
 
 - Backend: .NET 10 + ASP.NET Core + Ocelot + SQL Server
 - Frontend: React + TypeScript + Vite
