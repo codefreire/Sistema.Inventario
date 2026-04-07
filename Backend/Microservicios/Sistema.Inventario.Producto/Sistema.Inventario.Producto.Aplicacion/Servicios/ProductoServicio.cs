@@ -112,7 +112,7 @@ public class ProductoServicio : IProductoServicio
         {
             ProductoEntidad producto = new()
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 Nombre = request.Nombre,
                 Descripcion = request.Descripcion,
                 Categoria = request.Categoria,

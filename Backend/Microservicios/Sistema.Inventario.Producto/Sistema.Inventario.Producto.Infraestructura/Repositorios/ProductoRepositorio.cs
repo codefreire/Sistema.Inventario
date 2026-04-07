@@ -29,7 +29,10 @@ public class ProductoRepositorio : IProductoRepositorio
     /// <returns>Lista de productos</returns>
     public async Task<List<ProductoEntidad>> ObtenerProductosAsync()
     {
-        return await _contexto.Productos.AsNoTracking().ToListAsync();
+        return await _contexto.Productos
+            .AsNoTracking()
+            .OrderByDescending(producto => producto.Id)
+            .ToListAsync();
     }
 
     /// <summary>
