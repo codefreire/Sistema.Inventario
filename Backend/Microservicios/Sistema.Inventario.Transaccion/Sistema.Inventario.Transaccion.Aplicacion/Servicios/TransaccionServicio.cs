@@ -124,7 +124,7 @@ public class TransaccionServicio : ITransaccionServicio
 
             TransaccionEntidad transaccion = new()
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 Fecha = DateTime.Now,
                 TipoTransaccion = request.TipoTransaccion,
                 ProductoId = request.ProductoId,

@@ -30,7 +30,11 @@ public class TransaccionRepositorio : ITransaccionRepositorio
     /// <returns>Lista de transacciones</returns>
     public async Task<List<TransaccionEntidad>> ObtenerTransaccionesAsync()
     {
-        return await _contexto.Transacciones.AsNoTracking().ToListAsync();
+        return await _contexto.Transacciones
+            .AsNoTracking()
+            .OrderByDescending(transaccion => transaccion.Fecha)
+            .ThenByDescending(transaccion => transaccion.Id)
+            .ToListAsync();
     }
 
     /// <summary>
