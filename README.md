@@ -386,28 +386,49 @@ Reporte generado en:
 > **Nota:** Se agregan capturas de pantalla de la aplicación en funcionamiento a continuación.
 
 ### 1. Listado dinámico de productos con paginación
-<!-- ![Listado dinámico de productos](evidencias/listado-productos-paginacion.png) -->
+<p align="center">
+    <img src="ImagenesEvidencias/1_ListadoDinamicoProductosPaginacion.png" alt="Listado dinámico de productos" width="980" />
+</p>
 
 ### 2. Listado dinámico de transacciones con paginación
-<!-- ![Listado dinámico de transacciones](evidencias/listado-transacciones-paginacion.png) -->
+<p align="center">
+    <img src="ImagenesEvidencias/2_ListadoDinamicoTransaccionesPaginacion.png" alt="Listado dinámico de transacciones" width="980" />
+</p>
 
 ### 3. Pantalla para la creación de productos
-<!-- ![Creación de productos](evidencias/crear-producto.png) -->
+<p align="center">
+    <img src="ImagenesEvidencias/3_PantallaCreacionProductos.png" alt="Creación de productos" width="980" />
+</p>
 
 ### 4. Pantalla para la edición de productos
-<!-- ![Edición de productos](evidencias/editar-producto.png) -->
+<p align="center">
+    <img src="ImagenesEvidencias/4_PantallaEdicionProductos.png" alt="Edición de productos" width="980" />
+</p>
 
 ### 5. Pantalla para la creación de transacciones
-<!-- ![Creación de transacciones](evidencias/crear-transaccion.png) -->
+<p align="center">
+    <img src="ImagenesEvidencias/5_PantallaCreacionTransacciones.png" alt="Creación de transacciones" width="980" />
+</p>
 
 ### 6. Pantalla para la edición de transacciones
-<!-- ![Edición de transacciones](evidencias/editar-transaccion.png) -->
+<p align="center">
+    <img src="ImagenesEvidencias/6_PantallaEdicionTransacciones.png" alt="Edición de transacciones" width="980" />
+</p>
 
-### 7. Pantalla de filtros dinámicos
-<!-- ![Filtros dinámicos](evidencias/filtros-dinamicos.png) -->
+### 7. Pantalla de filtros dinámicos de productos
+<p align="center">
+    <img src="ImagenesEvidencias/7_PantallaFiltrosDinamicosProductos.png" alt="Filtros dinámicos de productos" width="980" />
+</p>
 
-### 8. Pantalla para la consulta de información de un formulario (extra)
-<!-- ![Consulta de información de formulario](evidencias/consulta-formulario-extra.png) -->
+### 8. Pantalla de filtros dinámicos de transacciones
+<p align="center">
+    <img src="ImagenesEvidencias/8_PantallaFiltrosDinamicosTransacciones.png" alt="Filtros dinámicos de transacciones" width="980" />
+</p>
+
+### 9. Pantalla para la consulta de información de un formulario (extra)
+<p align="center">
+    <img src="ImagenesEvidencias/9_PantallaConsultaInformacion.png" alt="Consulta de información de formulario" width="980" />
+</p>
 
 ---
 
